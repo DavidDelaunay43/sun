@@ -6,6 +6,14 @@ reload(mathfuncs)
 from ..constants_maya import *
 import maya.OpenMaya as om1
 
+def equidistant_numbers(num1, num2):
+    if num1 > num2:
+        num1, num2 = num2, num1
+
+    distance = (num2 - num1) / 4
+    result = [num1 + distance * i for i in range(1, 4)]
+    return tuple(result)
+
 def get_u_param( pnt = [], crv = None):
 
     point = om1.MPoint(pnt[0],pnt[1],pnt[2])

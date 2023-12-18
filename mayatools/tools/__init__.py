@@ -1,4 +1,5 @@
 from .tools_mod import (
+    equidistant_numbers,
     hide_historic,
     bake_pivot,
     auto_control,

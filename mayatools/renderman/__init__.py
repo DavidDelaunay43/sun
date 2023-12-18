@@ -13,3 +13,9 @@ from .renderman_mod import (
     bake_node,
     bake_auto
 )
+
+from .texture import (
+    repath_texture,
+    repath_textures,
+    RepathDialogUI
+)
