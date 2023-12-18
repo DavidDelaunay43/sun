@@ -1,17 +1,6 @@
-#--------------------------------------------------
-from ..utils.reloading import ReloadModule
-class RM(ReloadModule):
-    @classmethod
-    def reload(cls):
-        from . import ui_widgets
-        from ..maya_tools import matrix
-        cls.reload_mod(ui_widgets, matrix)
-RM.reload()
-#--------------------------------------------------
-
 from .ui_widgets import BaseDialog, XYZTransform, ButtonLineEdit, OkCancel, XYZFloat
 from .utils import maya_main_window, WindowManager
-from ..maya_tools.matrix import aim_matrix_on_selection
+from ..mayatools import matrix
 
 from PySide2.QtWidgets import QCheckBox, QVBoxLayout
 
@@ -71,4 +60,4 @@ class AimMatrixUI(BaseDialog):
         aim_vector = self.aim_vector_widget.get_value()
         up_vector = self.up_vector_widget.get_value()
         print(f"aim_matrix_on_selection({r}, {rx}, {ry}, {rz}, {aim_vector}, {up_vector})")
-        aim_matrix_on_selection(r, rx, ry, rz, aim_vector, up_vector, mo)
+        matrix.aim_matrix_on_selection(r, rx, ry, rz, aim_vector, up_vector, mo)

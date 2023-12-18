@@ -131,7 +131,7 @@ def switch_ik_fk(fk_joints: list, ik_joints: list, toggle_node: str = "blendColo
 
     return tgl_nodes
 
-def stretch_limb(ctrl: str, loc_start_parent: str, global_move: str, jnts: list):
+def stretch_limb(ctrl: str, loc_start_parent: str, global_move: str, jnts: list, switch_attribute: str = ""):
     """Apply stretch functionality to a limb.
 
     Args:
@@ -200,7 +200,7 @@ def stretch_limb(ctrl: str, loc_start_parent: str, global_move: str, jnts: list)
         $stretch = 1;
     }}
 
-    if ({ctrl}.{at_stretch} == 1){{
+    if ({ctrl}.{at_stretch} == 1 && {switch_attribute} == 1){{
         $stretch = $stretch;
     }}
     
@@ -213,9 +213,9 @@ def stretch_limb(ctrl: str, loc_start_parent: str, global_move: str, jnts: list)
     {jnt_end}.sx = $stretch;
     """
 
-    cmds.expression(s = exp_string, n = f"Exp_Stretch_{start_name}", ae = 1, uc = "all")
+    cmds.expression(string = exp_string, name = f"Exp_Stretch_{start_name}")
 
-    cmds.select(cl = 1)
+    cmds.select(clear = True)
     om.MGlobal.displayInfo( f"Stretch done on : {jnt_start} {jnt_mid} {jnt_end}." )
 
 def spine_ribbon(start: str, end: str, suffix: str = ''):

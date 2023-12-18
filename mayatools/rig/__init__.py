@@ -8,6 +8,8 @@ from .rig_mod import (
     foot_locs,
     no_roll_locs,
     no_roll_quat,
+)
+from .cartoon_eye_mod import (
     cartoon_eyelid,
     cartoon_eye
 )

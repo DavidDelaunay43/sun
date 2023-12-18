@@ -1,17 +1,6 @@
-#--------------------------------------------------
-from ..utils.reloading import ReloadModule
-class RM(ReloadModule):
-    @classmethod
-    def reload(cls):
-        from . import ui_widgets
-        from ..maya_tools import matrix
-        cls.reload_mod(ui_widgets, matrix)
-#RM.reload()
-#--------------------------------------------------
-
 from .ui_widgets import BaseDialog, XYZTransform, OkCancel
 from .utils import maya_main_window, WindowManager
-from ..maya_tools.matrix import matrix_on_selection
+from ..mayatools import matrix
 
 from PySide2.QtWidgets import QCheckBox, QVBoxLayout
 
@@ -88,4 +77,4 @@ class MatrixUI(BaseDialog):
     def run(self):
 
         t, r, s, tx, ty, tz, rx, ry, rz, sx, sy, sz, mo = self.get_checkbox_value()
-        matrix_on_selection(t, r, s, tx, ty, tz, rx, ry, rz, sx, sy, sz, mo)
+        matrix.matrix_on_selection(t, r, s, tx, ty, tz, rx, ry, rz, sx, sy, sz, mo)
