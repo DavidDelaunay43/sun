@@ -4,7 +4,6 @@ from .rig_mod import (
     get_ik,
     switch_ik_fk,
     stretch_limb,
-    spine_ribbon,
     foot_locs,
     no_roll_locs,
     no_roll_quat,
@@ -12,4 +11,8 @@ from .rig_mod import (
 from .cartoon_eye_mod import (
     cartoon_eyelid,
     cartoon_eye
+)
+
+from .spine_mod import (
+    spine_ribbon
 )
