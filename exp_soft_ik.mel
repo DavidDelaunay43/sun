@@ -1,0 +1,66 @@
+// Exp_soft_ik
+float $default_dist = 16;
+$dist_locs = distB_locs_soft.distance;
+$norm_dist = $dist_locs / $default_dist;
+$soft = ctrl.soft_ik;
+float $default_dist_soft = $default_dist - $soft;
+
+//-------------------------------------------------------------
+float $scale_factor;
+if ($norm_dist > 1){
+    $scale_factor = $norm_dist;
+}
+else{
+    $scale_factor = 1;
+}
+
+joint_soft_start.scaleX = $scale_factor;
+joint_01.scaleX = $scale_factor;
+joint_02.scaleX = $scale_factor;
+
+//-------------------------------------------------------------
+float $translate_factor;
+if ($dist_locs > $default_dist_soft){
+    $translate_factor = $default_dist_soft + $soft * (1 - exp(-($dist_locs - $default_dist_soft)));
+}
+else{
+    $translate_factor = $dist_locs;
+}
+
+joint_soft_end.translateX = $translate_factor;
+
+// Exp_soft_ik -----------------------------------------------------------------------------------------------------
+float $default_dist = 16;
+$dist_locs = distB_locs_soft.distance;
+$norm_dist = $dist_locs / $default_dist;
+$soft = ctrl.soft_ik;
+float $default_dist_soft = $default_dist - $soft;
+
+if (GlobalMove.scaleY > 1){
+    $norm_dist = $norm_dist / GlobalMove.scaleY;
+}
+
+//-------------------------------------------------------------
+float $scale_factor;
+if ($norm_dist > 1){
+    $scale_factor = $norm_dist;;
+}
+else{
+    $scale_factor = 1;
+}
+
+joint_soft_start.scaleX = $scale_factor;
+joint_01.scaleX = $scale_factor;
+joint_02.scaleX = $scale_factor;
+
+//-------------------------------------------------------------
+float $translate_factor;
+if ($dist_locs > $default_dist_soft){
+    $translate_factor = $default_dist_soft + $soft * (1 - exp(-($dist_locs - $default_dist_soft)));
+}
+else{
+    $translate_factor = $dist_locs;
+}
+
+joint_soft_end.translateX = $translate_factor
+

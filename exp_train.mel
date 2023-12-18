@@ -1,0 +1,20 @@
+// Exp train
+
+float $distance = train.translateZ; 
+float $radius = 1.5;
+float $pi = 3.14159265359;
+
+float $rotation = (360 * $distance) / (2 * $pi * $radius); 
+
+roue_01.rotateX = $rotation;
+roue_02.rotateX = $rotation;
+roue_03.rotateX = $rotation;
+
+[0][0][0]
+[0][0][1]
+[0][1][0]
+[0][1][1]
+[1][0][0]
+[1][0][1]
+[1][1][0]
+[1][1][1]

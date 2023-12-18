@@ -1,0 +1,77 @@
+$squash = ctrl_options.Squash;
+$stretch = ctrl_options.Stretch;
+$twist_chest = ctrl_options.Twist_Chest;
+$twist_pelvis = ctrl_options.Twist_Pelvis;
+$volume_activation = ctrl_options.Volume_Activation;
+$volume_factor = ctrl_options.Volume_Factor;
+$volume_offset = ctrl_options.Volume_Offset;
+$volume_intensity = ctrl_options.Volume_Intensity;
+$stretch_volume = ctrl_options.Stretch_Volume;
+$squash_volume = ctrl_options.Squash_Volume;
+
+// Volume Activation -----------------------------------------
+float $out_volume_activation;
+if ($volume_activation == 1){
+    $out_volume_activation = curveInfo_spine_ribbon_isoparm.arcLength / loc_info_axis_mid_spine_move.translateY;
+}
+
+else {
+    $out_volume_activation = 1;
+}
+
+// Stretch Volume ---------------------------------------------
+float $out_stretch_volume;
+if ($stretch_volume == 1){
+    $out_stretch_volume = 1;
+}
+else {
+    $out_stretch_volume = $stretch;
+}
+
+float $out_stretch_volume_02;
+if ($out_stretch_volume == 1){
+    $out_stretch_volume_02 = 1 / $out_volume_activation;;
+}
+else {
+    $out_stretch_volume_02 = 1;
+}
+
+// Squash Volume ---------------------------------------------
+float $out_squash_volume;
+if ($squash_volume == 1){
+    $out_squash_volume = 1;
+}
+else {
+    $out_squash_volume = $squash;
+}
+
+float $out_squash_volume_02;
+if ($out_squash_volume == 1){
+    $out_squash_volume_02 = $out_stretch_volume_02;
+}
+else {
+    $out_squash_volume_02 = 1;
+}
+
+// Factor Volume -----------------------------------------------
+float $factor_volume_XZ = $out_squash_volume_02 * $volume_factor;
+
+// Intensity Volume ---------------------------------------------
+float $neg_volume_intensity = ($volume_intensity * -1) + 1;
+
+// Offset Volume ------------------------------------------------
+float $half_volume_offset = $volume_offset * 0.5;
+
+
+// CONNECTIONS --------------------------------------------------
+rv_ctrl_ribbon_spine_01.outputMax = $factor_volume_XZ;
+rv_ctrl_ribbon_spine_02.outputMax = $factor_volume_XZ;
+rv_ctrl_ribbon_spine_03.outputMax = $factor_volume_XZ;
+rv_ctrl_ribbon_spine_04.outputMax = $factor_volume_XZ;
+rv_ctrl_ribbon_spine_05.outputMax = $factor_volume_XZ;
+
+rv_ctrl_ribbon_spine_01.inputMax = $volume_intensity;
+rv_ctrl_ribbon_spine_02.inputMax = $volume_intensity;
+rv_ctrl_ribbon_spine_03.inputMax = $volume_intensity;
+rv_ctrl_ribbon_spine_04.inputMax = $neg_volume_intensity;
+rv_ctrl_ribbon_spine_05.inputMax = $neg_volume_intensity;

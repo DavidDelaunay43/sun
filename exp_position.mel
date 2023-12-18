@@ -1,0 +1,15 @@
+$stretch = ctrl_options.Stretch;
+$ty = loc_info_axis_mid_spine_move.ty;
+$arclen = curveInfo_spine_ribbon_isoparm.arcLength;
+
+$no_stretch = (1/6) / $ty; 
+$div_param = $no_stretch / $arclen;
+float $neg_stretch_factor;
+
+if ($div_param < $no_stretch) {
+    $neg_stretch_factor = $div_param;
+}
+
+else {
+    $neg_stretch_factor = $neg_stretch_factor;
+}
