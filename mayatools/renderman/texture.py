@@ -10,22 +10,29 @@ def repath_texture(pxr_texture_node: str, old_string: str, new_string: str):
     file_name = file_name.replace('\\', '/')
     new_string = new_string.replace('\\', '/')
     
-    file_name.replace(old_string, new_string)
+    file_name = file_name.replace(old_string, new_string)
+    om.MGlobal.displayInfo(f'New file name : {file_name}')
     cmds.setAttr(f'{pxr_texture_node}.filename', file_name, type = 'string')
     
 def repath_textures(old_string = 'Z:', new_string = '//GANDALF/3d4_23_24/COUPDESOLEIL'):
     
     for node in cmds.ls(type = 'PxrTexture'):
-        repath_texture(node, old_string = old_string, new_string = new_string)
+        om.MGlobal.displayInfo(f'PxrTexture node : {node}')
+        repath_texture(node, old_string, new_string)
 
 class RepathDialogUI(QDialog):
     
     def __init__(self, parent = wrapInstance(int(omui.MQtUtil.mainWindow()), QWidget)):
         super(RepathDialogUI, self).__init__(parent)
+        self.init_ui()
         self.create_widgets()
         self.create_layout()
         self.create_connections()
         self.show()
+
+    def init_ui(self):
+        self.setWindowTitle('Repath textures')
+        self.setMinimumSize(500, 100)
         
     def create_widgets(self):
         self._old_string_label = QLabel('Old string :')
@@ -57,7 +64,7 @@ class RepathDialogUI(QDialog):
     
     def run(self):
         old_string = self._old_string_line_edit.text()
-        new_string = self._new_string_label.text()
+        new_string = self._new_string_line_edit.text()
         
         repath_textures(old_string = old_string, new_string = new_string)
         om.MGlobal.displayInfo(f'Repath textures : {old_string} to {new_string} done.')
