@@ -20,8 +20,7 @@ def transfert_rotation_by_matrix(source_node: str, destination_node: str):
     master_world_inverse_mtx = om.MMatrix(cmds.getAttr(f"{source_node}.worldInverseMatrix[0]"))
     offset_mtx = target_world_mtx * master_world_inverse_mtx
 
-    if 'arm' in source_node:
-        offset_mtx = offset_mtx.inverse()
+    offset_mtx = offset_mtx.inverse()
 
     euler_rotation = matrix_to_euler(offset_mtx)
     cmds.setAttr(f'{destination_node}.r', *euler_rotation)
@@ -32,6 +31,9 @@ def fk_to_ik(fk_nodes: tuple, ik_nodes: tuple, switch_node: str, namespace: str 
 
     fk_end, loc_pv = fk_nodes
     ctrl_end, pv = ik_nodes
+
+    if 'ankle' in fk_end:
+        fk_end = f'{fk_end}_match'
 
     if not cmds.objExists(switch_node):
         fk_end, loc_pv = f'{namespace}:{fk_end}', f'{namespace}:{loc_pv}'
@@ -50,12 +52,14 @@ def ik_to_fk(ik_nodes: tuple, fk_nodes: tuple, switch_node: str, namespace: str 
     drv_start, drv_mid, ctrl_end = ik_nodes
     fk_start, fk_mid, fk_end = fk_nodes
 
+    if 'leg' in ctrl_end:
+        ctrl_end = f'{ctrl_end}_match'
+    print(ctrl_end, 'CTRL END')
+
     if not cmds.objExists(switch_node):
         drv_start, drv_mid, ctrl_end = f'{namespace}:{drv_start}', f'{namespace}:{drv_mid}', f'{namespace}:{ctrl_end}'
         fk_start, fk_mid, fk_end = f'{namespace}:{fk_start}', f'{namespace}:{fk_mid}', f'{namespace}:{fk_end}'
         switch_node = f'{namespace}:{switch_node}'
-
-    #cmds.setAttr(f'{switch_node}.switch', 1) # switch en mode ik pour récupérer les valeurs
 
     r_start = cmds.getAttr(f'{drv_start}.r')[0]
     r_mid = cmds.getAttr(f'{drv_mid}.r')[0]
@@ -63,6 +67,7 @@ def ik_to_fk(ik_nodes: tuple, fk_nodes: tuple, switch_node: str, namespace: str 
     cmds.setAttr(f'{switch_node}.switch', 0) # switch en mode fk
 
     # on transfert les rotations sur les deux premières articulations
+    
     cmds.setAttr(f'{fk_start}.r', *r_start)
     cmds.setAttr(f'{fk_mid}.r', *r_mid)
 
