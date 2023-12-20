@@ -14,13 +14,13 @@ def face_to_edges(face: str) -> Tuple[str]:
         Tuple[str]: A tuple containing the names of two non-shared edges.
     """
 
-    edges = cmds.ls(cmds.polyListComponentConversion(face, ff=True, te=True ), fl=True)
+    edges = cmds.ls(cmds.polyListComponentConversion(face, ff=True, te=True ), flatten = True)
 
-    edge_01 = set(cmds.ls(cmds.polyListComponentConversion(edges[0], fe=True, tv=True), fl=True))
+    edge_01 = set(cmds.ls(cmds.polyListComponentConversion(edges[0], fe=True, tv=True), flatten = True))
     
     for i in range(1, len(edges)):
 
-        edge_02 = set(cmds.ls(cmds.polyListComponentConversion(edges[i], fe=True, tv=True), fl=True))
+        edge_02 = set(cmds.ls(cmds.polyListComponentConversion(edges[i], fromEdge = True, toVertex = True), flatten = True))
 
         if not edge_01 & edge_02:
 
@@ -140,8 +140,8 @@ def rivet_mesh(faces: Union[str, list[str]], name:str = "rivet", size: float = 1
 
 def rivet_mesh_user(name: str = "rivet", size: float = 1.0, col: str = "orange"):
 
-    selection = cmds.ls(sl = 1)
-    faces = cmds.filterExpand(selection, sm = 34)
+    selection = cmds.ls(selection = True)
+    faces = cmds.filterExpand(selection, selectionMask = 34)
     
     if faces:
         rivet_mesh(faces, name = name, size = size, col = col) 

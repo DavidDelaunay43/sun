@@ -42,7 +42,8 @@ def fk_to_ik(fk_nodes: tuple, ik_nodes: tuple, switch_node: str, namespace: str 
 
     cmds.setAttr(f'{switch_node}.switch', 1) # switch en mode ik
 
-    cmds.matchTransform(ctrl_end, fk_end, position = True, rotation = True)
+    cmds.matchTransform(ctrl_end, fk_end, position = True)
+    transfert_rotation_by_matrix(fk_end, ctrl_end)
     cmds.matchTransform(pv, loc_pv, position = True)
 
 def ik_to_fk(ik_nodes: tuple, fk_nodes: tuple, switch_node: str, namespace: str = None):
