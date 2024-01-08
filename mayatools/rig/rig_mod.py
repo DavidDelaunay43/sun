@@ -313,7 +313,23 @@ def no_roll_locs(jnt_pivot: str, jnt_const: str, ribbon_ctrl: Union[None, str], 
     return no_roll_grp
 
 def no_roll_quat(master: str, target: str) -> str:
-    """
+    """Apply a quaternion rotation from the 'master' transform to the 'target' transform,
+    excluding the roll component. This function creates and connects nodes in Maya to achieve
+    the desired quaternion rotation.
+
+    Parameters
+    ----------
+    master : str
+        The name of the master transform node that provides the rotation information.
+
+    target : str
+        The name of the target transform node where the rotation will be applied,
+        excluding the roll component.
+
+    Returns
+    -------
+    str
+        The name of the 'quatToEuler' node created during the process.
     """
 
     # create nodes

@@ -1,10 +1,9 @@
 from ...utils.imports import *
-from .. import constants_maya
-from .. import mathfuncs
+from .. import (
+    constants_maya
+)
 reload(constants_maya)
-reload(mathfuncs)
 from ..constants_maya import *
-import maya.OpenMaya as om1
 
 def equidistant_numbers(num1, num2):
     if num1 > num2:
