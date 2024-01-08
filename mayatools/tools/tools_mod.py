@@ -375,4 +375,3 @@ def get_base_wire(wire_node: str):
     shape_node = get_input_node(f"{wire_node}.baseWire[0]")
     transform_node = cmds.listRelatives(shape_node, parent = True)[0]
     return transform_node
- 
