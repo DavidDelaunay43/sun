@@ -31,7 +31,7 @@ def pv_cal(jnts: list, mult: float = 1.0) -> str:
 
     loc = cmds.spaceLocator()[0]
 
-    cmds.setAttr(f"{loc}.{TRANSLATE}", *pv_pos)
+    cmds.setAttr(f"{loc}.t", *pv_pos)
     
     om.MGlobal.displayInfo("Pole vector locator done.")
 

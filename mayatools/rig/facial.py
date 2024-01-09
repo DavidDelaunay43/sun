@@ -1,17 +1,22 @@
 from ...utils.imports import *
 from .. import (
+    constants_maya,
     curve,
-    tools
+    tools,
+    rivet
 )
+reload(constants_maya)
 reload(curve)
 reload(tools)
+reload(rivet)
+from constants_maya import *
 
 def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
     """
     """
 
     # curves
-    curve_start = curve.poly_curve_rebuild(edges, constructionHistory = False, 
+    curve_start: str = curve.poly_curve_rebuild(edges, constructionHistory = False, 
                         replaceOriginal = True, 
                         rebuildType = 0, 
                         endKnots = 0, 
@@ -22,9 +27,9 @@ def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
                         degree = 3, 
                         tolerance = 0.01)
     
-    SIDE = tools.get_side_from_node(curve_start)
-    
-    curve_end = cmds.duplicate(curve_start)
+    SIDE: str = tools.get_side_from_node(curve_start)
+    curve_start = cmds.rename(curve_start, f'crv_start_{face_area}_{SIDE}')
+    curve_end: str = cmds.duplicate(curve_start, name = f'crv_end_{face_area}_{SIDE}')
 
     if offset_axis == 'y':
         cmds.move(0, 0.05, 0, curve_end)
@@ -33,9 +38,9 @@ def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
         cmds.move(0, 0, 0.05, curve_end)
 
     # surface
-    rev_normal = 0 if SIDE == 'L' else 1
+    rev_normal: int = 0 if SIDE == 'L' else 1
 
-    ribbon = cmds.loft(curve_start, curve_end, n= f'ribbon_{face_area}_{SIDE}', constructionHistory = False, 
+    ribbon: str = cmds.loft(curve_start, curve_end, n= f'ribbon_{face_area}_{SIDE}', constructionHistory = False, 
                        uniform = True, 
                        close = False, 
                        autoReverse = True, 
@@ -45,13 +50,27 @@ def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
                        polygon = 0, 
                        reverseSurfaceNormals = rev_normal)[0]
     
-    u_spans = cmds.getAttr(f"{ribbon}.spansU")
-    v_spans = cmds.getAttr(f"{ribbon}.spansV")
+    u_spans: int = cmds.getAttr(f"{ribbon}.spansU")
+    v_spans: int = cmds.getAttr(f"{ribbon}.spansV")
 
     if u_spans == 1 and v_spans !=1:
-        u_param = False
-        v_param = True
+        u_param: bool = False
+        v_param: bool = True
+        isoparm_axis: str = 'u'
 
     else: # u_spans != 1 and v_spans ==1
-        u_param = True
-        v_param = False
+        u_param: bool = True
+        v_param: bool = False
+        isoparm_axis: str = 'v'
+
+    # rivets -------------------------------------------------------------------
+    rivet_grp: str = cmds.group(empty = True, world = True, name = f'rivet_{face_area}_{SIDE}')
+    ribbon_shape: str = cmds.listRelatives(ribbon, shapes = True)[0]
+    grp_rivets: str = rivet.rivet_nurbs(ribbon_shape, 'v', 5, jnt = True)
+    tools.ensure_group(grp_rivets, SHOW, ctrl_main = False)
+
+    # isoparm curve ------------------------------------------------------------
+    cmds.select(f'{ribbon}.{isoparm_axis}[0.5]', replace = True)
+    isoparm_selection: str = cmds.ls(selection = True)[0]
+    isoparm_curve: str = cmds.duplicateCurve(isoparm_selection, name = f'crv_isoparm_{face_area}_{SIDE}', constructionHistory = False, range = False, local = False)
+    curve.ensure_direction(isoparm_curve, 'positive') if SIDE == 'L' else curve.ensure_direction(isoparm_curve, 'negative')

@@ -245,7 +245,7 @@ def rivet_nurbs(
     size: float = 1.0, 
     col: str = "orange",
     delete_shape: bool = False
-):
+) -> str:
     """Create vectorial rivets on a NURBS surface.
 
     Args:
