@@ -50,6 +50,19 @@ def create_fk_leg(proxy_leg_jnt: str):
         fk_joints.append(jnt)
 
     joint.joint_to_transform(fk_joints, color = SIDE_COLOR[SIDE], op_mtx = False)
+    tools.rename_shape(fk_joints)
+
+    # -----------------------------------------------------------------
+    cmds.parent(fk_joints[3], world = True)
+    cmds.setAttr(f'{fk_joints[2]}.rz', 90)
+    cmds.parent(fk_joints[3], fk_joints[2])
+    offset.offset_parent_matrix(fk_joints[1:])
+
+    ankle_shape = cmds.listRelatives(fk_joints[2], shapes = True)[0]
+    cmds.select(f'{ankle_shape}.cv[0:8]', replace = True)
+    cmds.rotate(0, 0, 90)
+    cmds.select(clear = True)
+    # -----------------------------------------------------------------
 
     offset.move_op_matrix(fk_joints[0])
     attribute.cb_attributes(fk_joints, ats = ['tx', 'ty', 'tz', 'sx', 'sy', 'sz'], lock = True, hide = True)
@@ -149,8 +162,13 @@ def create_ik_setup_leg(drv_jnts: list):
 
     pole_vector = vector.pv_cal(drv_jnts)
     pole_vector = cmds.rename(pole_vector, f'pv_leg_{SIDE}')
+
+    triangle = curve.control(shape = "triangle_front", name = "triangle_01", color = SIDE_COLOR[SIDE])
+    cmds.matchTransform(triangle, pole_vector)
+    cmds.delete(pole_vector)
+    cmds.rename(triangle, pole_vector)
+
     cmds.move(0, 0, mathfuncs.distance_btw(drv_leg, drv_knee), pole_vector, relative = True)
-    display.color_node(pole_vector, SIDE_COLOR[SIDE])
     tools.ensure_group(pole_vector, CTRLS)
     offset.move_op_matrix(pole_vector)
     cmds.poleVectorConstraint(pole_vector, ik)
@@ -333,6 +351,8 @@ def create_ik_fk_setup_leg(proxy_leg_jnt: str, geo: str, sub: int = 7):
     '''
     '''
 
+    SIDE = tools.get_side_from_node(proxy_leg_jnt)
+
     fk_joints = create_fk_leg(proxy_leg_jnt)
     drv_joints_leg = create_drv_leg(proxy_leg_jnt)
     drv_joints_foot = create_drv_foot(proxy_leg_jnt)
@@ -348,10 +368,20 @@ def create_ik_fk_setup_leg(proxy_leg_jnt: str, geo: str, sub: int = 7):
     bind_ankle_move = cmds.listRelatives(drv_joints_foot[0], parent = True)[0]
     matrix.matrix_constraint(drv_joints_leg[-1], bind_ankle_move, t = True, r = True, mo = True)
 
-    rig.switch_ik_fk(fk_joints_sw, drv_joints_sw, switch_node = switch_node, ctrl = ctrl_ik, pv = pv)
+    _, _, tgl_node_ankle, _ = rig.switch_ik_fk(fk_joints_sw, drv_joints_sw, switch_node = switch_node, ctrl = ctrl_ik, pv = pv)
+
+    # ----------------------------------------------------------------------------
+    cmds.delete(tgl_node_ankle)
+    _, wt_mtx_node = matrix.matrix_constraint([fk_joints[2], ctrl_ik], drv_joints_foot[0], mo = True, r = True)
+    reverse_node = cmds.createNode('reverse', name = f'rev_switch_leg_{SIDE}')
+    cmds.connectAttr(f'{switch_node}.switch', f'{reverse_node}.inputX')
+
+    cmds.connectAttr(f'{reverse_node}.outputX', f'{wt_mtx_node}.wtMatrix[0].weightIn')
+    cmds.connectAttr(f'{switch_node}.switch', f'{wt_mtx_node}.wtMatrix[1].weightIn')
+    # ----------------------------------------------------------------------------
+
     cmds.connectAttr(f'{switch_node}.switch', f'{ik_ball}.ikBlend')
     cmds.connectAttr(f'{switch_node}.switch', f'{ik_toe}.ikBlend')
-
     create_locs_hierarchy_leg(geo, drv_joints_foot, ik, ik_ball, ik_toe, ctrl_ik)
 
     _, ctrl_end_b, _ = ribbon.limb_ribbon_assemble(*drv_joints_leg, switch_node, compense_translate = False, sub=sub)
@@ -372,22 +402,31 @@ def create_hip_leg_setup(proxy_root: str, proxy_leg_jnt_l: str, proxy_leg_jnt_r:
     '''
     '''
 
-    bind_hips = joint.curve_joint(name = f'{CTRL}_hips', color = 'white', normal = [0, 1, 0], radius = 2)
+    #bind_hips = joint.curve_joint(name = f'{CTRL}_hips', color = 'white', normal = [0, 1, 0], radius = 2)
+    ctrl_hips = curve.octagon_control(radius = 2.5, name = f'{CTRL}_hips', color = 'magenta')
+    bind_hips = cmds.joint(name = f'{BIND}_hips')
     bind_hip_l = cmds.joint(name = f'{BIND}_hip_L')
     bind_hip_r = cmds.joint(name = f'{BIND}_hip_R')
+    display.color_node([bind_hips, bind_hip_l, bind_hip_r], 'white')
 
+    tools.ensure_group(ctrl_hips, CTRLS)
     tools.ensure_group(bind_hips, JOINTS)
     tools.ensure_set([bind_hips, bind_hip_l, bind_hip_r])
 
+    cmds.matchTransform(ctrl_hips, proxy_root, position = True)
     cmds.matchTransform(bind_hips, proxy_root, position = True)
     cmds.matchTransform(bind_hip_l, proxy_leg_jnt_l, position = True)
     cmds.matchTransform(bind_hip_r, proxy_leg_jnt_r, position = True)
 
     cmds.parent(bind_hip_l, bind_hip_r, bind_hips)
 
+    offset.move_op_matrix(ctrl_hips)
     offset.move_op_matrix(bind_hips)
-    attribute.cb_attributes(bind_hips, ats = ['tx', 'ty', 'tz', 'sx', 'sy', 'sz'], lock = True, hide = True)
+    attribute.cb_attributes(ctrl_hips, ats = ['sx', 'sy', 'sz'], lock = True, hide = True)
 
+    matrix.matrix_constraint(ctrl_hips, f'{bind_hips}_{MOVE}', t = True, r = True)
+
+    #
     fk_move_l, drv_move_l, ctrl_ik_l, pv_l = create_ik_fk_setup_leg(proxy_leg_jnt_l, geo_l, sub=sub)
     fk_move_r, drv_move_r, ctrl_ik_r, pv_r = create_ik_fk_setup_leg(proxy_leg_jnt_r, geo_r, sub=sub)
 
@@ -396,8 +435,8 @@ def create_hip_leg_setup(proxy_root: str, proxy_leg_jnt_l: str, proxy_leg_jnt_r:
     deco_mtx_fk_move_r = matrix.matrix_constraint(bind_hip_r, fk_move_r, t = True, r = True, mo = True)
     deco_mtx_drv_move_r = matrix.matrix_constraint(bind_hip_r, drv_move_r, t = True, r = True, mo = True)
 
-    attribute.sep_cb(bind_hips, True)
-    cmds.addAttr(bind_hips, longName = 'constraint_rotate', niceName = 'Constraint Rotate', attributeType = 'long', min = 0, max = 1, dv = 0, keyable = True)
+    attribute.sep_cb(ctrl_hips, True)
+    cmds.addAttr(ctrl_hips, longName = 'constraint_rotate', niceName = 'Constraint Rotate', attributeType = 'long', min = 0, max = 1, dv = 0, keyable = True)
 
     deco_list = [deco_mtx_fk_move_l, deco_mtx_drv_move_l, deco_mtx_fk_move_r, deco_mtx_drv_move_r]
     grp_move_list = [fk_move_l, drv_move_l, fk_move_r, drv_move_r]
@@ -407,7 +446,7 @@ def create_hip_leg_setup(proxy_root: str, proxy_leg_jnt_l: str, proxy_leg_jnt_r:
         cmds.connectAttr(f'{deco_mtx}.outputRotate', f'{mult_node}.input1')
 
         for at in ['X', 'Y', 'Z']:
-            cmds.connectAttr(f'{bind_hips}.constraint_rotate', f'{mult_node}.input2{at}')
+            cmds.connectAttr(f'{ctrl_hips}.constraint_rotate', f'{mult_node}.input2{at}')
 
         cmds.connectAttr(f'{mult_node}.output', f'{grp_move}.rotate', force = True)
 
@@ -421,8 +460,8 @@ def create_hip_leg_setup(proxy_root: str, proxy_leg_jnt_l: str, proxy_leg_jnt_r:
     ctrl_ik_l_move = cmds.listRelatives(ctrl_ik_l, parent = True)[0]
     pv_l_move = cmds.listRelatives(pv_l, parent = True)[0]
 
-    _, wt_add_mtx_ctrl_ik_l_move = matrix.matrix_constraint([locator_world, bind_hips], ctrl_ik_l_move, t = True, r = True, mo = True)
-    _, wt_add_mtx_pv_l_move = matrix.matrix_constraint([locator_world, bind_hips], pv_l_move, t = True, r = True, mo = True)
+    _, wt_add_mtx_ctrl_ik_l_move = matrix.matrix_constraint([locator_world, ctrl_hips], ctrl_ik_l_move, t = True, r = True, mo = True)
+    _, wt_add_mtx_pv_l_move = matrix.matrix_constraint([locator_world, ctrl_hips], pv_l_move, t = True, r = True, mo = True)
 
     rev_node = cmds.createNode('reverse', name = f'rev_{ctrl_ik_l_move}_{pv_l_move}')
     cmds.connectAttr(f'{ctrl_ik_l}.leg_follow', f'{rev_node}.inputX')
@@ -443,8 +482,8 @@ def create_hip_leg_setup(proxy_root: str, proxy_leg_jnt_l: str, proxy_leg_jnt_r:
     ctrl_ik_r_move = cmds.listRelatives(ctrl_ik_r, parent = True)[0]
     pv_r_move = cmds.listRelatives(pv_r, parent = True)[0]
 
-    _, wt_add_mtx_ctrl_ik_r_move = matrix.matrix_constraint([locator_world, bind_hips], ctrl_ik_r_move, t = True, r = True, mo = True)
-    _, wt_add_mtx_pv_r_move = matrix.matrix_constraint([locator_world, bind_hips], pv_r_move, t = True, r = True, mo = True)
+    _, wt_add_mtx_ctrl_ik_r_move = matrix.matrix_constraint([locator_world, ctrl_hips], ctrl_ik_r_move, t = True, r = True, mo = True)
+    _, wt_add_mtx_pv_r_move = matrix.matrix_constraint([locator_world, ctrl_hips], pv_r_move, t = True, r = True, mo = True)
 
     rev_node = cmds.createNode('reverse', name = f'rev_{ctrl_ik_r_move}_{pv_r_move}')
     cmds.connectAttr(f'{ctrl_ik_r}.leg_follow', f'{rev_node}.inputX')
@@ -457,3 +496,7 @@ def create_hip_leg_setup(proxy_root: str, proxy_leg_jnt_l: str, proxy_leg_jnt_r:
     cmds.connectAttr(f'{ctrl_ik_r}.pv_follow', f'{wt_add_mtx_pv_r_move}.wtMatrix[1].weightIn')
 
     cmds.select(clear = True)
+
+    # no roll -------------------------------------------------------------------------------------------------------------------
+    rig.no_roll_locs('drv_leg_L', 'bind_hip_L', 'ctrl_A_ribbon_leg_L_01', invert = True)
+    rig.no_roll_locs('drv_leg_R', 'bind_hip_R', 'ctrl_A_ribbon_leg_R_01', invert = True)

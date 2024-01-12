@@ -23,6 +23,55 @@ reload(tools)
 reload(rivet)
 from ..constants_maya import *
 
+def control_on_joint(jnt_list: list, color: str = 'yellow'):
+    '''
+    '''
+
+    ctrl_list: list = []
+
+    for jnt in jnt_list:
+        # créer controleur
+        control = curve.octagon_control(normal = 'x', color = color, name = jnt.replace('bind', 'ctrl'), radius = 0.2)
+        tools.ensure_group(control, CTRLS)
+        cmds.matchTransform(control, jnt)
+
+        # parenter le controleur sous son parent s'il existe
+        jnt_parent = cmds.listRelatives(jnt, parent = True)
+        if jnt_parent:
+            jnt_parent = jnt_parent[0]
+            if jnt_parent in jnt_list:
+                ctrl_parent = jnt_parent.replace('bind', 'ctrl')
+                if cmds.objExists(ctrl_parent):
+                    cmds.parent(control, ctrl_parent)
+
+        # trouver enfant s'il existe
+        jnt_kid = cmds.listRelatives(jnt, children = True)
+        if jnt_kid:
+            jnt_kid = jnt_kid[0]
+            if jnt_kid in jnt_list:
+                ctrl_kid = jnt_kid.replace('bind', 'ctrl')
+                if cmds.objExists(ctrl_kid):
+                    cmds.parent(ctrl_kid, control)
+
+        ctrl_list.append(control)
+
+    offset.move_op_matrix(jnt_list)
+    offset.move_op_matrix(ctrl_list)
+
+    for jnt in jnt_list:
+        control = jnt.replace('bind', 'ctrl')
+        jnt_move = f'{jnt}_{MOVE}'
+        ctrl_move = jnt_move.replace('bind', 'ctrl')
+        cmds.connectAttr(f'{ctrl_move}.t', f'{jnt_move}.t')
+        cmds.connectAttr(f'{ctrl_move}.r', f'{jnt_move}.r')
+        cmds.connectAttr(f'{ctrl_move}.s', f'{jnt_move}.s')
+
+        cmds.connectAttr(f'{control}.t', f'{jnt}.t')
+        cmds.connectAttr(f'{control}.r', f'{jnt}.r')
+        cmds.connectAttr(f'{control}.s', f'{jnt}.s')
+
+    return ctrl_list
+
 def blend_colors(fk_jnt: str, ik_jnt: str, name: str = "blendColors") -> str:
     """Blend colors between two joints.
 

@@ -325,7 +325,7 @@ def preserve_joint_02(start: str, end: str, match_rotation: bool = False, color:
     cmds.connectAttr(f'{end}.rotateY', f'{average_node}.input1D[1]')
     cmds.connectAttr(f'{end}.rotateY', f'{div_node}.input1X')
 
-    cmds.connectAttr(f'{start}.rotateZ', f'{preserve_jnt}.rotateZ')
+    #cmds.connectAttr(f'{start}.rotateZ', f'{preserve_jnt}.rotateZ')
     cmds.connectAttr(f'{average_node}.output1D', f'{preserve_jnt}.rotateY')
 
     if match_rotation:
@@ -343,6 +343,8 @@ def preserve_joint_02(start: str, end: str, match_rotation: bool = False, color:
 def preserve_control(start: str, end: str, match_rotation: bool = False, color: str = 'yellow'):
     '''
     '''
+
+    SIDE = tools.get_side_from_node(start)
 
     cmds.select(clear = True)
     # naming
@@ -363,6 +365,11 @@ def preserve_control(start: str, end: str, match_rotation: bool = False, color: 
     offset.move_hook_op_matrix(preserve_ctrl)
 
     cmds.matchTransform(f'{preserve_ctrl}_{HOOK}', end)
+
+    if SIDE == 'R':
+        cmds.setAttr(f'{preserve_ctrl}_{HOOK}.r', 90, 0 , -90)
+        
+    offset.offset_parent_matrix(f'{preserve_ctrl}_{HOOK}')
     matrix.matrix_constraint(start, f'{preserve_ctrl}_{HOOK}', r = True, mo = True)
     matrix.matrix_constraint(end, f'{preserve_ctrl}_{MOVE}', t = True)
 

@@ -1,4 +1,5 @@
 from .tools_mod import (
+    rename_shape,
     equidistant_numbers,
     hide_historic,
     bake_pivot,

@@ -23,7 +23,7 @@ def create_preserve_jnt(joint: str):
     to_delete = cmds.listRelatives(preserve_jnt, children = True)
     cmds.delete(to_delete)
 
-    display.color_node(preserve_jnt, 'white')
+    display.color_node(preserve_jnt, 'magenta')
     parent_node = cmds.listRelatives(joint, parent = True)[0]
     try:
         cmds.parent(preserve_jnt, parent_node)
@@ -94,7 +94,7 @@ def orient_last_jnt(jnts: Union[str, list]):
         None
     """
 
-    jnts = ensure_list(jnts)
+    jnts = tools.ensure_list(jnts)
 
     for jnt in jnts:
         last_jnt = cmds.listRelatives(jnt, children = True, type = "joint", allDescendents = True)[0]

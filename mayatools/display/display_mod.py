@@ -1,4 +1,6 @@
 from ...utils.imports import *
+from .. import tools
+reload(tools)
 
 def color_node(nodes: Union[str, list], 
     input_col: Literal["blue", "blue_elec", "gold", "green", "magenta", "orange", "pink", "red", "yellow", "white"]
@@ -13,7 +15,7 @@ def color_node(nodes: Union[str, list],
         None
     """
 
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
 
     colors = {
         "blue": ((0.26279, 0.61957, 0.99998), (0.0, 0.801, 1.0)),
@@ -40,7 +42,7 @@ def color_node(nodes: Union[str, list],
 
 def joint_rad(jnts: Union[str, list], factor: float):
 
-    jnts = ensure_list(jnts)
+    jnts = tools.ensure_list(jnts)
 
     for jnt in jnts:
 
@@ -60,7 +62,7 @@ def lod_vis(nodes: Union[str, list], v: bool):
         None
     """
 
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
 
     for node in nodes:
         shape = cmds.listRelatives(node, shapes = True)[0]
@@ -82,7 +84,7 @@ def loc_size(locs: Union[str, list], size: float):
         None
     """
 
-    locs = ensure_list(locs)
+    locs = tools.ensure_list(locs)
 
     size = (size, size, size)
 

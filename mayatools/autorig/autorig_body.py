@@ -21,14 +21,14 @@ reload(curve)
 reload(rig)
 
 def autorig_body(
-        proxy_clavicle_jnt_l: str, proxy_arm_jnt_l: str, 
-        proxy_clavicle_jnt_r: str, proxy_arm_jnt_r: str,
-        proxy_root: str, proxy_chest: str,
-        proxy_leg_jnt_l: str, proxy_leg_jnt_r: str, 
-        geo_l: str, geo_r: str,
-        arm_sub: int = 5,
-        leg_sub: int = 5
-        ):
+    proxy_clavicle_jnt_l: str, proxy_arm_jnt_l: str, 
+    proxy_clavicle_jnt_r: str, proxy_arm_jnt_r: str,
+    proxy_root: str, proxy_chest: str,
+    proxy_leg_jnt_l: str, proxy_leg_jnt_r: str, 
+    geo_l: str, geo_r: str,
+    arm_sub: int = 5,
+    leg_sub: int = 5
+    ):
     '''
     '''
 

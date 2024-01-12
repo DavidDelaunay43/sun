@@ -52,11 +52,7 @@ def create_fk_arm(proxy_arm_jnt: str):
         fk_joints.append(jnt)
 
     joint.joint_to_transform(fk_joints, color = SIDE_COLOR[SIDE], op_mtx = True)
-
-    cmds.parent(fk_joints[3], world = True)
-    cmds.setAttr(f'{fk_joints[2]}.rz', 90)
-    cmds.parent(fk_joints[3], fk_joints[2])
-    offset.offset_parent_matrix(fk_joints[1:])
+    tools.rename_shape(fk_joints)
 
     offset.move_op_matrix(fk_joints[0])
     attribute.cb_attributes(fk_joints, ats = ['sx', 'sy', 'sz'], lock = True, hide = True)
@@ -150,6 +146,12 @@ def create_ik_setup_arm(drv_jnts: list):
 
     pole_vector = vector.pv_cal(drv_jnts)
     pole_vector = cmds.rename(pole_vector, f'pv_arm_{SIDE}')
+
+    triangle = curve.control(shape = "triangle_back", name = "triangle_01", color = SIDE_COLOR[SIDE])
+    cmds.matchTransform(triangle, pole_vector)
+    cmds.delete(pole_vector)
+    cmds.rename(triangle, pole_vector)
+
     cmds.move(0, 0, mathfuncs.distance_btw(drv_arm, drv_elbow) * -1, pole_vector, relative = True)
     display.color_node(pole_vector, SIDE_COLOR[SIDE])
     tools.ensure_group(pole_vector, CTRLS)

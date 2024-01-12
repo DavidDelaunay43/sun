@@ -2,9 +2,11 @@ from ...utils.imports import *
 from .. import constants_maya
 from .. import attribute
 from .. import display
+from .. import tools
 reload(constants_maya)
 reload(attribute)
 reload(display)
+reload(tools)
 from ..constants_maya import *
 
 def matrix_aim_constraint(masters: Union[str, list], target: str,
@@ -152,7 +154,7 @@ def matrix_constraint(masters: Union[str, list], target: str,
 
         return mult_mtx
 
-    masters = ensure_list(masters)
+    masters = tools.ensure_list(masters)
 
     num = len(masters)
     deco_mtx = cmds.createNode("decomposeMatrix", name = f"{target}_{DECO_MTX}")

@@ -1,9 +1,11 @@
 from ...utils.imports import *
 from .. import constants_maya
 from .. import display
+from .. import offset
 from .. import tools
 reload(constants_maya)
 reload(display)
+reload(offset)
 reload(tools)
 from ..constants_maya import SHAPES_CTRL
 
@@ -11,7 +13,7 @@ def add_shape(nodes):
     '''
     '''
 
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
     for node in nodes:
         ctrl = cmds.circle(normal = [1, 0, 0], constructionHistory = False)[0]
         parent_shapes([ctrl, node])
@@ -20,7 +22,7 @@ def scale_shape(curves, value: float):
     '''
     '''
 
-    curves = ensure_list(curves)
+    curves = tools.ensure_list(curves)
     for curve in curves:
         cvs = cmds.getAttr(f"{curve}.spans") + cmds.getAttr(f"{curve}.degree")
         om.MGlobal.displayInfo(f"{cvs}")
@@ -31,7 +33,7 @@ def shape_vis(nodes, vis: bool):
     '''
     '''
 
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
 
     for node in nodes:
 

@@ -1,8 +1,14 @@
 from ...utils.imports import *
+from .. import (
+    constants_maya,
+    attribute,
+    display,
+    tools)
+reload(constants_maya)
+reload(attribute)
+reload(display)
+reload(tools)
 from ..constants_maya import *
-from ..attribute import sep_cb
-from ..display import color_node, loc_size
-from ..tools import ensure_set
 
 def face_to_edges(face: str) -> Tuple[str]:
     """Convert a face to a pair of non-shared edges.
@@ -43,7 +49,7 @@ def rivet_mesh_setup(name: str, edge_a: str, edge_b: str, size: float = 1.0, col
     cmds.setAttr(f"{rivet_shape}.localScaleY", size)
     cmds.setAttr(f"{rivet_shape}.localScaleZ", size)
 
-    color_node(rivet, col)
+    display.color_node(rivet, col)
 
     edge_a_num = int(re.sub(r'[^\d]+', '', edge_a))
     edge_b_num = int(re.sub(r'[^\d]+', '', edge_b))
@@ -132,7 +138,7 @@ def rivet_mesh_setup(name: str, edge_a: str, edge_b: str, size: float = 1.0, col
 
 def rivet_mesh(faces: Union[str, list[str]], name:str = "rivet", size: float = 1.0, col: str = "orange"):
 
-    faces = ensure_list(faces)
+    faces = tools.ensure_list(faces)
 
     for face in faces:
         edge_01, edge_02 = face_to_edges(face)
@@ -150,7 +156,7 @@ def connect_rivet(node: str, surface_shape: str, parameter: float, uv: Literal['
     '''
     '''
 
-    sep_cb(node)
+    attribute.sep_cb(node)
     if uv in ['u', 'v']:
         cmds.addAttr(node, at = "float", ln = f"parameter_{uv}", min = 0, max = 1, dv = parameter, k = 1)
         cmds.setAttr(f"{node}.parameter_{uv}", cb = 1, k = 0)
@@ -222,8 +228,8 @@ def connect_rivet(node: str, surface_shape: str, parameter: float, uv: Literal['
     if jnt:
         cmds.select(node)
         bind_jnt = cmds.joint(n= f"bind_{node}")
-        ensure_set(bind_jnt)
-        color_node(bind_jnt, "white")
+        tools.ensure_set(bind_jnt)
+        display.color_node(bind_jnt, "white")
 
     if delete_shape:
         loc_shape = cmds.listRelatives(node, shapes = True)[0]
@@ -285,8 +291,8 @@ def rivet_nurbs(
         cmds.setAttr(f'{shape}.v', 0)
         cmds.parent(rivet, rivets_grp)
 
-        color_node(rivet, col)
-        loc_size(rivet, size)
+        display.color_node(rivet, col)
+        display.loc_size(rivet, size)
 
         parameter = round(increment * i - offset, 3)
         connect_rivet(rivet, surface_shape, parameter, uv, jnt, delete_shape)

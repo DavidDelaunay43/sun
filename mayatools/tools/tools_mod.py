@@ -5,6 +5,20 @@ from .. import (
 reload(constants_maya)
 from ..constants_maya import *
 
+def rename_shape(nodes: Union[str, list]) -> None:
+    '''
+    '''
+
+    nodes: list = ensure_list(nodes)
+    for node in nodes:
+        shape: str = cmds.listRelatives(node, shapes = True)
+        if not shape:
+            continue
+        shape: str = shape[0]
+        shape_name: str = f'{node}Shape'
+        if not shape == shape_name:
+            cmds.rename(shape, shape_name)
+
 def equidistant_numbers(num1, num2):
     if num1 > num2:
         num1, num2 = num2, num1

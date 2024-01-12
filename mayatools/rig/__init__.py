@@ -1,4 +1,5 @@
 from .rig_mod import (
+    control_on_joint,
     blend_colors,
     pair_blend,
     get_ik,
