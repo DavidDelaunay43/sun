@@ -49,7 +49,7 @@ def create_fk_leg(proxy_leg_jnt: str):
 
         fk_joints.append(jnt)
 
-    joint.joint_to_transform(fk_joints, color = SIDE_COLOR[SIDE], op_mtx = True)
+    joint.joint_to_transform(fk_joints, color = SIDE_COLOR[SIDE], op_mtx = False)
 
     offset.move_op_matrix(fk_joints[0])
     attribute.cb_attributes(fk_joints, ats = ['tx', 'ty', 'tz', 'sx', 'sy', 'sz'], lock = True, hide = True)
@@ -138,9 +138,9 @@ def create_ik_setup_leg(drv_jnts: list):
     SIDE = tools.get_side_from_node(drv_leg)
 
     ik = cmds.ikHandle(startJoint = drv_leg, endEffector = drv_ankle, solver = 'ikRPsolver', name = f'ik_leg_{SIDE}')[0]
-    attribute.cb_attributes(ik, lock = True)
+    #attribute.cb_attributes(ik, lock = True)
 
-    ctrl_ik = curve.octagon_control(name = f'{CTRL}_leg_{SIDE}', normal = 'x', color = SIDE_COLOR[SIDE])
+    ctrl_ik = curve.octagon_control(name = f'{CTRL}_leg_{SIDE}', normal = 'y', color = SIDE_COLOR[SIDE])
     display.color_node(ctrl_ik, SIDE_COLOR[SIDE])
     cmds.matchTransform(ctrl_ik, ik, position = True)
     tools.ensure_group(ctrl_ik, CTRLS)
@@ -184,7 +184,7 @@ def create_switch_node_leg(drv_jnts: list):
     SIDE = tools.get_side_from_node(drv_leg)
 
     ctrl = f'switch_leg_{SIDE}'
-    curve.star_control(name = ctrl, color = 'orange')
+    curve.star_control(name = ctrl, color = 'pink')
 
     cmds.matchTransform(ctrl, drv_leg, position = True)
     
@@ -362,7 +362,7 @@ def create_ik_fk_setup_leg(proxy_leg_jnt: str, geo: str, sub: int = 7):
 
     # stretch
     drv_move = cmds.listRelatives(drv_joints_leg[0], parent = True)[0]
-    rig.stretch_limb(ctrl_ik, drv_move, 'ctrl_main', drv_joints_leg)
+    rig.stretch_limb(ctrl_ik, drv_move, 'ctrl_main', drv_joints_leg, f'{switch_node}.switch')
 
     cmds.select(clear = True)
     om.MGlobal.displayInfo('Ik Fk setup leg done.')

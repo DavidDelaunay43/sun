@@ -48,9 +48,11 @@ def ribbon(sub: int = 5, name: str = "ribbon", sinus: bool = False, color: str =
     # ribbon surface
     surface = cmds.nurbsPlane(name = name, axis = [0, 1, 0], lengthRatio = sub, patchesV = sub, width = 2, constructionHistory = False)[0]
     surface_shape = cmds.listRelatives(surface, shapes = True)[0]
-    cmds.select(f'{surface}.cv[0:3][0:{sub+2}]')
-    mel.eval('rotate -r -p 0cm 0cm 0cm -os -fo 0 -90 0 ;')
-
+    #cmds.select(f'{surface}.cv[0:3][0:{sub+2}]')
+    #mel.eval('rotate -r -p 0cm 0cm 0cm -os -fo 0 -90 0 ;')
+    cmds.setAttr(f'{surface}.ry', -90)
+    cmds.makeIdentity(surface, apply = True, r = True)
+    
     cmds.select(clear = True)
     cmds.setAttr(f'{surface}.tx', base_translate)
 

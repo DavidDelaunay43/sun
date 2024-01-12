@@ -53,8 +53,13 @@ def create_fk_arm(proxy_arm_jnt: str):
 
     joint.joint_to_transform(fk_joints, color = SIDE_COLOR[SIDE], op_mtx = True)
 
+    cmds.parent(fk_joints[3], world = True)
+    cmds.setAttr(f'{fk_joints[2]}.rz', 90)
+    cmds.parent(fk_joints[3], fk_joints[2])
+    offset.offset_parent_matrix(fk_joints[1:])
+
     offset.move_op_matrix(fk_joints[0])
-    attribute.cb_attributes(fk_joints, ats = ['tx', 'ty', 'tz', 'sx', 'sy', 'sz'], lock = True, hide = True)
+    attribute.cb_attributes(fk_joints, ats = ['sx', 'sy', 'sz'], lock = True, hide = True)
     attribute.vis_no_keyable(fk_joints)
     
     tools.ensure_group(f'{fk_joints[0]}_{MOVE}', CTRLS)
@@ -104,7 +109,7 @@ def create_switch_node_arm(drv_jnts: list):
     SIDE = tools.get_side_from_node(drv_arm)
 
     ctrl = f'switch_arm_{SIDE}'
-    curve.star_control(name = ctrl, color = 'orange')
+    curve.star_control(name = ctrl, color = 'pink')
 
     cmds.matchTransform(ctrl, drv_arm, position = True)
 
@@ -226,7 +231,7 @@ def create_ik_fk_setup_arm(proxy_arm_jnt: str, sub: int = 5):
 
     # stretch -------------------------------------------------------------------------------------------------------
     drv_move = cmds.listRelatives(drv_joints[0], parent = True)[0]
-    rig.stretch_limb(ctrl_ik, drv_move, 'ctrl_main', drv_joints)
+    rig.stretch_limb(ctrl_ik, drv_move, 'ctrl_main', drv_joints, switch_attribute = f'{switch_node}.switch')
 
     return fk_move, drv_move, ctrl_ik, pv, ctrl_start_a
 
