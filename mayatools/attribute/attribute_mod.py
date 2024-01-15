@@ -1,4 +1,5 @@
 from ...utils.imports import *
+from .. import tools
 from functools import partial
 
 def disconnect_attributes(node: str, attributes: list):
@@ -39,7 +40,7 @@ def rman_attribs(nodes, value: bool):
         None
     """
     
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
     
     for node in nodes:
         _set_rman_attr(node, value)
@@ -67,7 +68,7 @@ def sep_cb(nodes: Union[str, list], value: bool = True, style: Literal["hyphen",
     v : boole -- add or delete separator
     """
 
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
     
     styles = {
         "hyphen": "---------------",
@@ -99,7 +100,7 @@ def cb_attributes(nodes: Union[list, str], ats = ["tx", "ty", "tz", "rx", "ry", 
     hide: bool = False, show: bool = False, 
     nonkeyable: bool = False, keyable: bool = False):
 
-    nodes = ensure_list(nodes)
+    nodes = tools.ensure_list(nodes)
 
     for node in nodes:
         for at in ats:

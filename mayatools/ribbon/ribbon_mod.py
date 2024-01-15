@@ -462,7 +462,7 @@ def limb_ribbon_assemble(
 
     # compense translate
     if compense_translate:
-        rv_node_translate = cmds.createNode('remapValue', name = f'rv_translate_{preserve_jnt}')
+        """rv_node_translate = cmds.createNode('remapValue', name = f'rv_translate_{preserve_jnt}')
         cmds.setAttr(f'{rv_node_translate}.inputMin', -120)
         cmds.setAttr(f'{rv_node_translate}.inputMax', 120)
         cmds.setAttr(f'{rv_node_translate}.outputMin', 0.19)
@@ -476,10 +476,11 @@ def limb_ribbon_assemble(
         cmds.connectAttr(f'{switch_node}.slide', f'{rv_node_slide_translate}.inputValue')
         cmds.connectAttr(f'{rv_node_translate}.outValue', f'{rv_node_slide_translate}.outputMin')
 
-        cmds.connectAttr(f'{rv_node_slide_translate}.outValue', f'{preserve_jnt}.tz')
+        cmds.connectAttr(f'{rv_node_slide_translate}.outValue', f'{preserve_jnt}.tz')"""
+        pass
 
     # connect rotate
-    cmds.connectAttr(f'{ik_start}.rz', f'{preserve_jnt}.rz')
+    #cmds.connectAttr(f'{ik_start}.rz', f'{preserve_jnt}.rz')
 
     om.MGlobal.displayInfo('Limb Ribbon Assemnle done.')
 
