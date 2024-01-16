@@ -21,7 +21,7 @@ def _set_rman_attr(node: str, value: bool):
         value (bool): _description_
     """
 
-    attributes = cmds.listAttr(node, string = "rman*") or []
+    attributes: list = cmds.listAttr(node, string = "rman*") or []
 
     for at in attributes:
         try:
@@ -40,7 +40,7 @@ def rman_attribs(nodes, value: bool):
         None
     """
     
-    nodes = tools.ensure_list(nodes)
+    nodes: list = tools.ensure_list(nodes)
     
     for node in nodes:
         _set_rman_attr(node, value)
@@ -55,7 +55,7 @@ def rman_attribs(nodes, value: bool):
 
 def dag_rman_attribs(value: bool):
 
-    dag_nodes = cmds.ls(dagObjects = True)    
+    dag_nodes: list = cmds.ls(dagObjects = True)    
     rman_attribs(dag_nodes, value)
 
 def sep_cb(nodes: Union[str, list], value: bool = True, style: Literal["hyphen", "underscore"] = "hyphen"):
@@ -68,14 +68,14 @@ def sep_cb(nodes: Union[str, list], value: bool = True, style: Literal["hyphen",
     v : boole -- add or delete separator
     """
 
-    nodes = tools.ensure_list(nodes)
+    nodes: list = tools.ensure_list(nodes)
     
     styles = {
         "hyphen": "---------------",
         "underscore": "____________"
     }
 
-    sep_string = styles[style]
+    sep_string: str = styles[style]
 
     for node in nodes:
 
@@ -100,7 +100,7 @@ def cb_attributes(nodes: Union[list, str], ats = ["tx", "ty", "tz", "rx", "ry", 
     hide: bool = False, show: bool = False, 
     nonkeyable: bool = False, keyable: bool = False):
 
-    nodes = tools.ensure_list(nodes)
+    nodes: list = tools.ensure_list(nodes)
 
     for node in nodes:
         for at in ats:
@@ -127,7 +127,7 @@ vis_no_keyable = partial(cb_attributes, ats = ['v'], nonkeyable = True)
           
 def watermark():
 
-    nodes = cmds.ls(selection = True)
+    nodes: list = cmds.ls(selection = True)
 
     for node in nodes:
         cmds.addAttr(node, ln = 'watermark', nn = 'DAVID', at = 'enum', en = 'DELAUNAY', k=1)

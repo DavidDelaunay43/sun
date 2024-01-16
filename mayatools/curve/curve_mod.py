@@ -10,19 +10,39 @@ reload(tools)
 from ..constants_maya import SHAPES_CTRL
 
 def add_shape(nodes):
-    '''
+    '''Add a custom shape to the specified Maya nodes.
+
+    Parameters
+    ----------
+    nodes : Union[str, List[str]]
+        A single node or a list of nodes to which the custom shape will be added.
+
+    Returns
+    -------
+    None
     '''
 
-    nodes = tools.ensure_list(nodes)
+    nodes: list = tools.ensure_list(nodes)
     for node in nodes:
         ctrl = cmds.circle(normal = [1, 0, 0], constructionHistory = False)[0]
         parent_shapes([ctrl, node])
 
 def scale_shape(curves, value: float):
-    '''
+    '''Scale the specified Maya curves by a given factor.
+
+    Parameters
+    ----------
+    curves : Union[str, List[str]]
+        A single curve or a list of curves to be scaled.
+    value : float
+        The scaling factor applied to the curves.
+
+    Returns
+    -------
+    None
     '''
 
-    curves = tools.ensure_list(curves)
+    curves: list = tools.ensure_list(curves)
     for curve in curves:
         cvs = cmds.getAttr(f"{curve}.spans") + cmds.getAttr(f"{curve}.degree")
         om.MGlobal.displayInfo(f"{cvs}")
@@ -30,10 +50,21 @@ def scale_shape(curves, value: float):
         cmds.scale(value, value, value, ws = 1)
 
 def shape_vis(nodes, vis: bool):
-    '''
+    '''Set the visibility of the shapes associated with the specified Maya nodes.
+
+    Parameters
+    ----------
+    nodes : Union[str, List[str]]
+        A single node or a list of nodes whose associated shapes' visibility will be set.
+    vis : bool
+        The visibility state to be set for the shapes. True for visible, False for hidden.
+
+    Returns
+    -------
+    None
     '''
 
-    nodes = tools.ensure_list(nodes)
+    nodes: list = tools.ensure_list(nodes)
 
     for node in nodes:
 
@@ -44,23 +75,53 @@ def ensure_shape():
     '''
     '''
 
-    kids = cmds.listRelatives('ctrl_main', shapes = True)
+    kids: list = cmds.listRelatives('ctrl_main', shapes = True)
     if not kids:
         display.color_node('ctrl_main', 'orange')
         circle = cmds.circle(radius = 8.0, constructionHistory = False, normal = [0, 1, 0])[0]
         parent_shapes([circle, 'ctrl_main'])
 
 def get_cv_coords():
+    '''Retrieve the world-space coordinates of control vertices for the selected Maya curve.
 
-    node = cmds.ls(selection = True)[0]
+    Returns
+    -------
+    None
+    '''
 
-    num_vtx = cmds.getAttr(f'{node}.degree') + cmds.getAttr(f'{node}.spans')
+    nodes: list = cmds.ls(selection = True)
+
+    if not nodes:
+        om.MGlobal.displayError('Nothing is selected.')
+        return
+    
+    node: str = nodes[0]
+
+    num_vtx: int = cmds.getAttr(f'{node}.degree') + cmds.getAttr(f'{node}.spans')
     for i in range(0, num_vtx):
         coord = cmds.xform(f'{node}.cv[{i}]', query = True, translation = True, worldSpace = True)
         print(coord)
 
 def regular_control(side_num: int, radius: float = 1.0, normal: Literal['x', 'y', 'z'] = 'y', name: str = 'regluar_control', color: str = 'yellow'):
-    '''
+    '''Create a regular polygon control curve in Maya.
+
+    Parameters
+    ----------
+    side_num : int
+        Number of sides of the regular polygon.
+    radius : float, optional
+        Radius of the control curve, default is 1.0.
+    normal : {'x', 'y', 'z'}, optional
+        Normal direction of the control curve, default is 'y'.
+    name : str, optional
+        Name of the created control curve, default is 'regular_control'.
+    color : str, optional
+        Color of the control curve, default is 'yellow'.
+
+    Returns
+    -------
+    str
+        The name of the created control curve.
     '''
 
     points = []
@@ -86,7 +147,21 @@ heptagon_control = partial(regular_control, side_num = 7)
 octagon_control = partial(regular_control, side_num = 8)
 
 def star_control(name: str = 'star_control', color: str = 'red', normal = [0, 0, 1]):
-    '''
+    '''Create a star-shaped control curve in Maya.
+
+    Parameters
+    ----------
+    name : str, optional
+        Name of the created control curve, default is 'star_control'.
+    color : str, optional
+        Color of the control curve, default is 'red'.
+    normal : List[float], optional
+        Normal direction of the control curve, default is [0, 0, 1].
+
+    Returns
+    -------
+    str
+        The name of the created control curve.
     '''
 
     ctrl = cmds.circle(normal = normal, ch = False, name = name)[0]
@@ -116,7 +191,27 @@ def control(shape: str = "sphere", name: str = "control", color: str = "yellow")
     return name
 
 def poly_to_curve(edge, form: int = 0, degree: int = 1, conform_preview: int = 1, ch: bool = False, name: str = "polyToCurve") -> str:
-    """
+    """Convert a polygon edge to a NURBS curve in Maya.
+
+    Parameters
+    ----------
+    edge : str
+        The polygon edge to be converted to a curve.
+    form : int, optional
+        Form of the resulting curve (0 for linear, 1 for smooth), default is 0.
+    degree : int, optional
+        Degree of the resulting curve, default is 1.
+    conform_preview : int, optional
+        Conformity to the smooth mesh preview (0 for off, 1 for on), default is 1.
+    ch : bool, optional
+        Preserve construction history, default is False.
+    name : str, optional
+        Name of the created curve, default is "polyToCurve".
+
+    Returns
+    -------
+    str
+        The name of the created curve.
     """
 
     om.MGlobal.displayInfo(f"Polygon edge to convert : {edge}")
@@ -178,7 +273,17 @@ def parent_shapes(nodes: list):
         cmds.delete(node)
 
 def get_curve_length(curve_name: str):
-    """
+    """Get the length of a NURBS curve in Maya.
+
+    Parameters
+    ----------
+    curve_name : str
+        The name of the NURBS curve.
+
+    Returns
+    -------
+    float
+        The length of the NURBS curve.
     """
     
     sel = om.MSelectionList()
@@ -191,20 +296,30 @@ def get_curve_length(curve_name: str):
     
     return curve_length
 
-def get_curve_vertex_count(curve: str):
-    """
+def get_curve_vertex_count(curve: str) -> int:
+    """Get the total number of vertices on a NURBS curve in Maya.
+
+    Parameters
+    ----------
+    curve : str
+        The name of the NURBS curve.
+
+    Returns
+    -------
+    int
+        The total number of vertices on the NURBS curve.
     """
     
-    degree = cmds.getAttr(f'{curve}.degree')
-    span = cmds.getAttr(f'{curve}.spans')
+    degree: int = cmds.getAttr(f'{curve}.degree')
+    span: int = cmds.getAttr(f'{curve}.spans')
     return degree + span
 
 def loc_on_curve(curve: str, num: int, name: str = "loc", scale = 0.02):
     """
     """
     
-    curve_shape = cmds.listRelatives(curve, shapes = True)[0]
-    loc_list = []
+    curve_shape: str = cmds.listRelatives(curve, shapes = True)[0]
+    loc_list: list = []
     
     for i in range(num):
         
@@ -223,11 +338,21 @@ def loc_on_curve(curve: str, num: int, name: str = "loc", scale = 0.02):
     return loc_list
 
 def ensure_direction(curve: str, direction: Literal["positive", "negative"]):
+    """Ensure the direction of a NURBS curve in Maya.
+
+    Parameters
+    ----------
+    curve : str
+        The name of the NURBS curve.
+    direction : Literal["positive", "negative"]
+        The desired direction of the curve, either "positive" or "negative".
+
+    Returns
+    -------
+    None
     """
     
-    """
-    
-    num_cvs = get_curve_vertex_count(curve)
+    num_cvs: int = get_curve_vertex_count(curve)
     xpos_zero = cmds.pointPosition(f"{curve}.cv[0]")[0]
     xpos_end = cmds.pointPosition(f"{curve}.cv[{num_cvs-1}]")[0]
     
