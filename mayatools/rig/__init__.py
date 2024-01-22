@@ -17,3 +17,6 @@ from .cartoon_eye_mod import (
 from .spine_mod import (
     spine_ribbon
 )
+from .facial import (
+    facial_ribbon
+)

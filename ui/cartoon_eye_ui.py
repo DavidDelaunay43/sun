@@ -4,15 +4,15 @@ class RM(ReloadModule):
     @classmethod
     def reload(cls):
         from . import base_dialog
-        from ..maya_tools import tools, rig
+        from ..mayatools import tools, rig
         cls.reload_mod(base_dialog, tools, rig)
 #RM.reload()
 #--------------------------------------------------
 
 from .ui_widgets.base_dialog import BaseDialog
 from .utils.constants import maya_main_window
-from ..maya_tools.tools import return_set_members
-from ..maya_tools.rig import cartoon_eye
+from ..mayatools.tools import return_set_members
+from ..mayatools.rig import cartoon_eye
 
 from PySide2.QtWidgets import QCheckBox, QGridLayout
 from functools import partial

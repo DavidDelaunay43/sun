@@ -9,7 +9,7 @@ reload(constants_maya)
 reload(curve)
 reload(tools)
 reload(rivet)
-from constants_maya import *
+from constants_maya import SHOW
 
 def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
     """
@@ -44,9 +44,8 @@ def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
                        uniform = True, 
                        close = False, 
                        autoReverse = True, 
-                       degree = 3, 
-                       sectionSpans = 1, 
-                       reverseSurfaceNormals = False, 
+                       degree = 3,
+                       sectionSpans = 1,
                        polygon = 0, 
                        reverseSurfaceNormals = rev_normal)[0]
     

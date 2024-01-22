@@ -156,6 +156,8 @@ def connect_rivet(node: str, surface_shape: str, parameter: float, uv: Literal['
     '''
     '''
 
+    TAN = uv.capitalize()
+
     attribute.sep_cb(node)
     if uv in ['u', 'v']:
         cmds.addAttr(node, at = "float", ln = f"parameter_{uv}", min = 0, max = 1, dv = parameter, k = 1)
@@ -183,16 +185,16 @@ def connect_rivet(node: str, surface_shape: str, parameter: float, uv: Literal['
     cmds.setAttr(f"{vec_prod}.operation", 2)
 
     cmds.connectAttr(f"{posi}.normal", f"{vec_prod}.input1")
-    cmds.connectAttr(f"{posi}.tangentV", f"{vec_prod}.input2")
+    cmds.connectAttr(f"{posi}.tangent{TAN}", f"{vec_prod}.input2")
 
     # matrix
     cmds.connectAttr(f"{posi}.normalX", f"{matrix}.in00")
     cmds.connectAttr(f"{posi}.normalY", f"{matrix}.in01")
     cmds.connectAttr(f"{posi}.normalZ", f"{matrix}.in02")
 
-    cmds.connectAttr(f"{posi}.tangentVx", f"{matrix}.in10")
-    cmds.connectAttr(f"{posi}.tangentVy", f"{matrix}.in11")
-    cmds.connectAttr(f"{posi}.tangentVz", f"{matrix}.in12")
+    cmds.connectAttr(f"{posi}.tangent{TAN}x", f"{matrix}.in10")
+    cmds.connectAttr(f"{posi}.tangent{TAN}y", f"{matrix}.in11")
+    cmds.connectAttr(f"{posi}.tangent{TAN}z", f"{matrix}.in12")
 
     cmds.connectAttr(f"{vec_prod}.outputX", f"{matrix}.in20")
     cmds.connectAttr(f"{vec_prod}.outputY", f"{matrix}.in21")
