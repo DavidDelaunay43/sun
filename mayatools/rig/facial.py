@@ -9,7 +9,21 @@ reload(constants_maya)
 reload(curve)
 reload(tools)
 reload(rivet)
-from constants_maya import SHOW
+from ..constants_maya import SHOW
+
+def remap_scale(jnts: list):
+    """
+    """
+
+    for jnt in jnts:
+
+        rm_node = cmds.createNode('remapValue', name = f'rm_{jnt}')
+        cmds.setAttr(f'{rm_node}.inputMax', -65)
+        cmds.setAttr(f'{rm_node}.outputMin', 1)
+        cmds.setAttr(f'{rm_node}.outMax', 0.745)
+
+        cmds.connectAttr(f'{jnt}.rz', f'{rm_node}.inputValue')
+        cmds.connectAttr(f'{rm_node}.outputValue', f'{jnt}.sx')
 
 def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
     """

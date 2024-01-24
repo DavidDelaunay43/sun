@@ -81,6 +81,9 @@ def cartoon_eyelid(eye_geo: str, edge: list, dir: str, world_up_object: str):
     locators = curve.loc_on_curve(curve_, cv_num, name = f"{LOC}_{EYELID}_{dir}_{SIDE}")
     cmds.parent(locators, grp_loc)
     
+    # find eye center
+    
+
     # Bind joints
     center_pos = cmds.xform(eye_geo, query = True, rotatePivot = True, worldSpace = True)
     for num, loc in enumerate(locators):
