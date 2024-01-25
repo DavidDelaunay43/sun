@@ -87,3 +87,46 @@ def facial_ribbon(edges, face_area: str, offset: float, offset_axis: str):
     isoparm_selection: str = cmds.ls(selection = True)[0]
     isoparm_curve: str = cmds.duplicateCurve(isoparm_selection, name = f'crv_isoparm_{face_area}_{SIDE}', constructionHistory = False, range = False, local = False)
     curve.ensure_direction(isoparm_curve, 'positive') if SIDE == 'L' else curve.ensure_direction(isoparm_curve, 'negative')
+
+def facial_ribbon_02(curve_start: str, curve_end: str, face_area: str, riv_num: int = 5):
+    """
+    """
+
+    SIDE = tools.get_side_from_node(curve_start)
+
+    # surface
+    rev_normal: int = 0 if SIDE == 'L' else 1
+
+    ribbon: str = cmds.loft(curve_start, curve_end, n= f'ribbon_{face_area}', constructionHistory = False, 
+                       uniform = True, 
+                       close = False, 
+                       autoReverse = True, 
+                       degree = 3,
+                       sectionSpans = 1,
+                       polygon = 0, 
+                       reverseSurfaceNormals = rev_normal)[0]
+    
+    u_spans: int = cmds.getAttr(f"{ribbon}.spansU")
+    v_spans: int = cmds.getAttr(f"{ribbon}.spansV")
+
+    if u_spans == 1 and v_spans !=1:
+        u_param: bool = False
+        v_param: bool = True
+        isoparm_axis: str = 'u'
+
+    else: # u_spans != 1 and v_spans ==1
+        u_param: bool = True
+        v_param: bool = False
+        isoparm_axis: str = 'v'
+
+    # rivets -------------------------------------------------------------------
+    rivet_grp: str = cmds.group(empty = True, world = True, name = f'rivet_{face_area}')
+    ribbon_shape: str = cmds.listRelatives(ribbon, shapes = True)[0]
+    grp_rivets: str = rivet.rivet_nurbs(ribbon_shape, 'u', riv_num, jnt = True)
+    tools.ensure_group(grp_rivets, SHOW, ctrl_main = False)
+
+    # isoparm curve ------------------------------------------------------------
+    cmds.select(f'{ribbon}.{isoparm_axis}[0.5]', replace = True)
+    isoparm_selection: str = cmds.ls(selection = True)[0]
+    isoparm_curve: str = cmds.duplicateCurve(isoparm_selection, name = f'crv_isoparm_{face_area}', constructionHistory = False, range = False, local = False)[0]
+    curve.ensure_direction(isoparm_curve, 'positive') if SIDE == 'L' else curve.ensure_direction(isoparm_curve, 'negative')

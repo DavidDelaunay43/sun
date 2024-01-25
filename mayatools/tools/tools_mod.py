@@ -103,7 +103,11 @@ def hide_historic(ctrl_main: str = 'ctrl_main', attribute = 'mode'):
         'remapValue',
         'setRange',
         'nonLinear',
-        'expression'
+        'expression',
+        'blendColors',
+        'reverse',
+        'floatMath',
+        'blendShape',
     )
 
     for type in types:
