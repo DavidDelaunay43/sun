@@ -23,6 +23,18 @@ reload(tools)
 reload(rivet)
 from ..constants_maya import *
 
+def replace_joint_by_transform(drvs: list):
+    '''
+    '''
+
+    for drv in drvs:
+
+        drv_parent = cmds.listRelatives(drv, parent = True)
+        drv_child = cmds.listRelatives(drv, children = True)
+        drv_shape = cmds.listRelatives(drv, shapes = True)
+
+        # to do...
+
 def control_on_joint(jnt_list: list, color: str = 'yellow'):
     '''
     '''
