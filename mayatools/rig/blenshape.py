@@ -1,10 +1,4 @@
 from ...utils.imports import *
-from .. import (
-    constants_maya
-)
-
-reload(constants_maya)
-from ..constants_maya import *
 
 def transfer_deformation_to_blendshape(
     base_geo: str,
