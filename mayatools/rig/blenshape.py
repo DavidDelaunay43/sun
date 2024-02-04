@@ -71,8 +71,6 @@ def transfer_deformation_to_blendshape(
         cmds.connectAttr(f'{control}.{axis}', f'{rm_node}.inputValue')
         cmds.connectAttr(f'{rm_node}.outValue', f'{blendshape_node}.{control}_{axis}{suffix}')
     
-    
-        
     for control, transforms in controlers.items():
         
         for axis, values in transforms.items():
