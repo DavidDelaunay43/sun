@@ -24,3 +24,6 @@ from .blenshape import (
     transfer_deformation_to_blendshape,
     TransferDialog
 )
+from .tools import (
+    rivet_geo
+)
