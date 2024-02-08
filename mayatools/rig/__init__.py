@@ -25,5 +25,6 @@ from .blenshape import (
     TransferDialog
 )
 from .tools import (
-    rivet_geo
+    rivet_geo,
+    create_blendshapes
 )
