@@ -56,8 +56,9 @@ def transfer_deformation_to_blendshape(
         cmds.blendShape(blendshape_node, edit = True, topologyCheck = True, target = [base_geo, index, deformed_geo, 1.0], weight = [index, 0.0], tangentSpace = True)
         cmds.aliasAttr(f'{control}_{axis}{suffix}', f'{blendshape_node}.w[{index}]')
         
-        bad_attribute = cmds.listConnections(f'{deformed_geo}.worldMesh[0]', source = False, destination = True, plugs = True)[0]
-        cmds.disconnectAttr(f'{deformed_geo}.worldMesh[0]', bad_attribute)
+        bad_attribute = cmds.listConnections(f'{deformed_geo}.worldMesh[0]', source = False, destination = True, plugs = True)
+        if bad_attribute:
+            cmds.disconnectAttr(f'{deformed_geo}.worldMesh[0]', bad_attribute[0])
         
         if axis.startswith('s'):
             cmds.setAttr(f'{control}.{axis}', 1)
@@ -69,7 +70,7 @@ def transfer_deformation_to_blendshape(
             cmds.setAttr(f'{rm_node}.inputMin', 1)
         cmds.setAttr(f'{rm_node}.inputMax', value)
         cmds.connectAttr(f'{control}.{axis}', f'{rm_node}.inputValue')
-        cmds.connectAttr(f'{rm_node}.outValue', f'{blendshape_node}.{control}_{axis}{suffix}')
+        cmds.connectAttr(f'{rm_node}.outValue', f'{blendshape_node}.{control}_{axis}{suffix}', force = True)
     
     for control, transforms in controlers.items():
         
