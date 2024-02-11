@@ -1,4 +1,4 @@
-from ...utils.imports import *
+from maya import cmds
 from PySide2.QtWidgets import QDialog, QWidget, QLineEdit, QPushButton, QVBoxLayout, QGridLayout, QLabel
 from shiboken2 import wrapInstance
 import maya.OpenMayaUI as omui
@@ -68,3 +68,5 @@ class RepathDialogUI(QDialog):
         
         repath_textures(old_string = old_string, new_string = new_string)
         om.MGlobal.displayInfo(f'Repath textures : {old_string} to {new_string} done.')
+
+RepathDialogUI()
