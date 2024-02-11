@@ -1,7 +1,7 @@
 import os
 from maya import cmds
 import maya.OpenMayaUI as omui
-from PySide2.QtWidgets import QWidget, QDialog, QVBoxLayout, QGridLayout, QLineEdit, QPushButton, QCheckBox
+from PySide2.QtWidgets import QWidget, QDialog, QVBoxLayout, QGridLayout, QLineEdit, QPushButton, QCheckBox, QRadioButton
 from shiboken2 import wrapInstance
 
 CACHE_DIRECTORY = r'//gandalf/3d4_23_24/COUPDESOLEIL/11_cache'
@@ -13,21 +13,6 @@ def ensure_directory(directory: str):
         return
     
     os.makedirs(directory)
-
-def ensure_directory(directory: str):
-    
-    if os.path.exists(directory):
-        return
-    
-    sh_dir_name = os.path.basename(directory)
-    seq_dir = os.path.dirname(directory)
-    
-    if os.path.exists(seq_dir):
-        os.mkdir(os.path.join(seq_dir, sh_dir_name))
-        
-    else:
-        os.makedirs(directory)
-        
 
 def only_mseh_in_set(set_name: str):
     
@@ -62,8 +47,8 @@ def get_abc_file_name(set_name: str) -> str:
     char_name = set_name.split(':')[0]
     
     scene_name: str = os.path.basename(cmds.file(query = True, sceneName = True))
-    prefix, seq_num, sh_num, department, _, _ = scene_name.split('_')
-    alembic_file_name: str = '_'.join([prefix, seq_num, sh_num, char_name, department]) + '.abc'
+    prefix, seq_num, sh_num, _, _, _ = scene_name.split('_')
+    alembic_file_name: str = '_'.join([prefix, seq_num, sh_num, char_name, 'anim']) + '.abc'
     
     return alembic_file_name
 
@@ -86,7 +71,23 @@ def export_alembics(start: int, end: int, char_sets: str, directory: str):
     
     for char_set in char_sets:
         export_abc(start, end, char_set, directory)
+
+def import_abc(char_set: str, directory: str):
     
+    abc_file_path: str = os.path.join(directory, get_abc_file_name(char_set))
+    
+    set_members: list = cmds.sets(char_set, query = True, nodesOnly = True)
+    roots: str = ''
+    for geo in set_members:
+        roots += f'{geo} '
+    
+    cmds.AbcImport(abc_file_path, mode = 'import', connect = roots)
+    
+def import_alembics(char_sets: str, directory: str):
+    
+    for char_set in char_sets:
+        import_abc(char_set, directory)
+
 def maya_main_window():
     main_window_pointer = omui.MQtUtil.mainWindow()
     return wrapInstance(int(main_window_pointer), QWidget) 
@@ -102,9 +103,13 @@ class ExportAbcDialog(QDialog):
         self.show()
         
     def init_ui(self):
-        self.setWindowTitle('Export Alembic')
+        self.setWindowTitle('Alembic Tools')
         
     def create_widgets(self):
+        
+        self.export_radiobtn = QRadioButton('Export')
+        self.export_radiobtn.setChecked(True)
+        self.import_radiobtn = QRadioButton('Import')
         
         start, end = get_time_slider_range()
         
@@ -117,7 +122,7 @@ class ExportAbcDialog(QDialog):
             cb_char_set.setChecked(True)
             self.cb_char_sets.append(cb_char_set)
         
-        self.run_btn = QPushButton('Export Alembic')
+        self.run_btn = QPushButton('Run')
     
     def create_layout(self):
         
@@ -127,10 +132,13 @@ class ExportAbcDialog(QDialog):
         self.grid_layout = QGridLayout(self.grid_widget)
         self.main_layout.addWidget(self.grid_widget)
         
-        self.grid_layout.addWidget(self.start_lineedit, 0, 0)
-        self.grid_layout.addWidget(self.end_lineedit, 0, 1)
+        self.grid_layout.addWidget(self.export_radiobtn, 0, 0)
+        self.grid_layout.addWidget(self.import_radiobtn, 0, 1)
         
-        for index, cb_char_set in enumerate(self.cb_char_sets, start = 1):
+        self.grid_layout.addWidget(self.start_lineedit, 1, 0)
+        self.grid_layout.addWidget(self.end_lineedit, 1, 1)
+        
+        for index, cb_char_set in enumerate(self.cb_char_sets, start = 2):
             self.grid_layout.addWidget(cb_char_set, index, 0)
         
         self.main_layout.addWidget(self.run_btn)
@@ -143,16 +151,18 @@ class ExportAbcDialog(QDialog):
         
         scene_name: str = os.path.basename(cmds.file(query = True, sceneName = True))
         _, seq_num, sh_num, _, _, _ = scene_name.split('_')
+        directory = os.path.join(CACHE_DIRECTORY, seq_num, sh_num)
         
         char_sets = []
         for cb_char_set in self.cb_char_sets:
             if cb_char_set.isChecked():
                 char_sets.append(cb_char_set.text())
         
-        start, end = self.start_lineedit.text(), self.end_lineedit.text()
-        scene_name: str = os.path.basename(cmds.file(query = True, sceneName = True))
-        _, seq_num, sh_num, _, _, _ = scene_name.split('_')
-        directory = os.path.join(CACHE_DIRECTORY, seq_num, sh_num)
-        export_alembics(start, end, char_sets, directory)
-        
+        if self.export_radiobtn.isChecked():
+            start, end = self.start_lineedit.text(), self.end_lineedit.text()
+            export_alembics(start, end, char_sets, directory)
+            
+        elif self.import_radiobtn.isChecked():
+            import_alembics(char_sets, directory)
+   
 ExportAbcDialog()
