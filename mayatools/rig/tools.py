@@ -1,5 +1,19 @@
 from ...utils.imports import *
 
+def blendshape_setup(weigth_name: str):
+
+    loc_01, loc_02, bshape_node = cmds.ls(selection = True)
+    dist_b = cmds.createNode('distanceBetween', name = f'distB_locs_{weigth_name}')
+    cmds.connectAttr(f'{loc_01}.worldPosition[0]', f'{dist_b}.point1')
+    cmds.connectAttr(f'{loc_02}.worldPosition[0]', f'{dist_b}.point2')
+    distance = cmds.getAttr(f'{dist_b}.distance')
+
+    rm_node = cmds.createNode('remapValue', name = f'rm_{weigth_name}')
+    cmds.connectAttr(f'{dist_b}.distance', f'{rm_node}.inputValue')
+    cmds.setAttr(f'{rm_node}.inputMin', distance)
+    cmds.setAttr(f'{rm_node}.inputMax', 0.1)
+    cmds.connectAttr(f'{rm_node}.outValue', f'{bshape_node}.{weigth_name}')
+
 def rivet_geo():
     '''
     '''
