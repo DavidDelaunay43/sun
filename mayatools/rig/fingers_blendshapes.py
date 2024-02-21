@@ -46,7 +46,7 @@ def rotation_matrix_setup(moving_node: str, static_node: str) -> str:
 
     return decompose_matrix_node
 
-def finger_blendshape(geo: str, blendshape_node: str, transform_axis: str, transform_value: float, moving_phalanx: str):
+def finger_blendshape(geo: str, blendshape_node: str, transform_axis: str, transform_value: float, moving_phalanx: str, existing_target: bool = False):
     
     moving_phalanx_up_grp = cmds.listRelatives(moving_phalanx, parent = True)[0]
     static_phalanx = cmds.listRelatives(moving_phalanx_up_grp, parent = True)[0]
@@ -54,7 +54,9 @@ def finger_blendshape(geo: str, blendshape_node: str, transform_axis: str, trans
     alias_name: str = f'{moving_phalanx}_{transform_axis}'
     deco_mtx_output_attribute: str = f'output{transform_axis[0].upper()}{transform_axis[1:]}' 
 
-    add_target(geo, geo, blendshape_node, alias_name = alias_name)
+    if not existing_target:
+        add_target(geo, geo, blendshape_node, alias_name = alias_name)
+    
     decompose_matrix_node: str = rotation_matrix_setup(moving_phalanx, static_phalanx)
 
     remap_value_node: str = cmds.createNode('remapValue', name = f'rv_{alias_name}')
@@ -62,8 +64,8 @@ def finger_blendshape(geo: str, blendshape_node: str, transform_axis: str, trans
     cmds.setAttr(f'{remap_value_node}.inputMax', transform_value)
     cmds.connectAttr(f'{remap_value_node}.outValue', f'{blendshape_node}.{alias_name}')
 
-def fingers_blendshapes(geo: str, blendshape_node: str, transform_axis: str, transform_value: float, all_moving_phalanx: list):
+def fingers_blendshapes(geo: str, blendshape_node: str, transform_axis: str, transform_value: float, all_moving_phalanx: list, existing_target: bool = False):
 
     for moving_phalanx in all_moving_phalanx:
 
-        finger_blendshape(geo, blendshape_node, transform_axis, transform_value, moving_phalanx)
+        finger_blendshape(geo, blendshape_node, transform_axis, transform_value, moving_phalanx, existing_target = existing_target)

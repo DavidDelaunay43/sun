@@ -99,7 +99,6 @@ def hide_historic(ctrl_main: str = 'ctrl_main', attribute = 'mode'):
         'pointOnCurveInfo',
         'plusMinusAverage',
         'multiplyDivide',
-        'skinCluster',
         'remapValue',
         'setRange',
         'nonLinear',
@@ -107,7 +106,7 @@ def hide_historic(ctrl_main: str = 'ctrl_main', attribute = 'mode'):
         'blendColors',
         'reverse',
         'floatMath',
-        'blendShape',
+        'quatToEuler'
     )
 
     for type in types:
