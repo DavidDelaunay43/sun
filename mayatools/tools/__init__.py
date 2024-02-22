@@ -1,7 +1,7 @@
 from .tools_mod import (
     rename_shape,
     equidistant_numbers,
-    hide_historic,
+    set_historic,
     bake_pivot,
     auto_control,
     get_side_from_node,

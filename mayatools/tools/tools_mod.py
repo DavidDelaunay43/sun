@@ -85,7 +85,7 @@ def get_dag_path( objectName):
         selectionList.getDagPath(0, oNode)
         return oNode
 
-def hide_historic(ctrl_main: str = 'ctrl_main', attribute = 'mode'):
+def set_historic(value: bool = False):
     '''
     '''
 
@@ -106,22 +106,20 @@ def hide_historic(ctrl_main: str = 'ctrl_main', attribute = 'mode'):
         'blendColors',
         'reverse',
         'floatMath',
-        'quatToEuler'
+        'quatToEuler',
+        'distanceBetween',
+        'dagPose',
+        'blinn',
+        'projection',
+        'colorCorrect',
+        'layeredShader',
+        'displayLayer'
     )
 
     for type in types:
         nodes = cmds.ls(type = type)
         for node in nodes:
-            try:
-                cmds.connectAttr(f'{ctrl_main}.{attribute}', f'{node}.ihi')
-            except:
-                pass
-
-    for node in cmds.ls('bindPose*'):
-        try:
-            cmds.connectAttr(f'{ctrl_main}.{attribute}', f'{node}.ihi')
-        except:
-            pass
+            cmds.setAttr(f'{node}.ihi', value)
 
 def bake_pivot(node: str, x = 'cx', y = 'ymin', z =  'cz'):
     '''

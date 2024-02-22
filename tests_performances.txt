@@ -1,0 +1,23 @@
+BlendShape preSkin - Tangent space :
+Playback Speeds
+===============
+     DG = 5.77812 fps
+    EMS = 4.88918 fps
+    EMP = 22.6586 fps
+
+BlendShape postSkin - Tangent space :
+Instable, maya crash
+
+BlendShape preSkin - Object space :
+Playback Speeds
+===============
+     DG = 5.74273 fps
+    EMS = 5.00668 fps
+    EMP = 22.6586 fps
+
+BlendShape postSkin - Object space :
+Playback Speeds
+===============
+     DG = 5.78258 fps
+    EMS = 4.9867 fps
+    EMP = 22.4551 fps
