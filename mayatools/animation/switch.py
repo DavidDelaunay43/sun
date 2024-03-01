@@ -1,4 +1,6 @@
-from ...utils.imports import *
+from maya import cmds
+from maya.api import OpenMaya as om
+from functools import partial
 
 def matrix_to_translation(matrix: om.MMatrix):
     transform_matrix = om.MTransformationMatrix(matrix)
@@ -29,8 +31,16 @@ def fk_to_ik(fk_nodes: tuple, ik_nodes: tuple, switch_node: str, namespace: str 
     """
     """
 
+    print('Snape FK to IK')
+
     fk_end, loc_pv = fk_nodes
     ctrl_end, pv = ik_nodes
+
+    #
+    cmds.setAttr(f'{ctrl_end}.t', 0, 0, 0)
+    cmds.setAttr(f'{ctrl_end}.r', 0, 0, 0)
+    cmds.setAttr(f'{pv}.t', 0, 0, 0)
+    #
 
     if 'ankle' in fk_end:
         fk_end = f'{fk_end}_match'
@@ -50,6 +60,8 @@ def ik_to_fk(ik_nodes: tuple, fk_nodes: tuple, switch_node: str, namespace: str 
     """
     """
 
+    print('Snape IK to FK')
+
     drv_start, drv_mid, ctrl_end = ik_nodes
     fk_start, fk_mid, fk_end = fk_nodes
 
@@ -64,15 +76,13 @@ def ik_to_fk(ik_nodes: tuple, fk_nodes: tuple, switch_node: str, namespace: str 
 
     r_start = cmds.getAttr(f'{drv_start}.r')[0]
     r_mid = cmds.getAttr(f'{drv_mid}.r')[0]
-
-    cmds.setAttr(f'{switch_node}.switch', 0) # switch en mode fk
-
-    # on transfert les rotations sur les deux premières articulations
     
+    # transfer
     cmds.setAttr(f'{fk_start}.r', *r_start)
     cmds.setAttr(f'{fk_mid}.r', *r_mid)
-
-    transfert_rotation_by_matrix(ctrl_end, fk_end)
+    cmds.matchTransform(fk_end, ctrl_end, rotation = True)
+     
+    cmds.setAttr(f'{switch_node}.switch', 0) # switch en mode fk
 
 fk_to_ik_arm_r = partial(fk_to_ik, fk_nodes = ('fk_wrist_R', 'loc_pv_arm_R'), ik_nodes = ('ctrl_arm_R', 'pv_arm_R'), switch_node = 'switch_arm_R')
 fk_to_ik_arm_l = partial(fk_to_ik, fk_nodes = ('fk_wrist_L', 'loc_pv_arm_L'), ik_nodes = ('ctrl_arm_L', 'pv_arm_L'), switch_node = 'switch_arm_L')
