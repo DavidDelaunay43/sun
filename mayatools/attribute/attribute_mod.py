@@ -21,7 +21,11 @@ def _set_rman_attr(node: str, value: bool):
         value (bool): _description_
     """
 
-    attributes: list = cmds.listAttr(node, string = "rman*") or []
+    attributes: list = cmds.listAttr(node, string = "rman*")
+
+    if not attributes:
+        om.MGlobal.displayInfo('No rman attribute.')
+        return
 
     for at in attributes:
         try:

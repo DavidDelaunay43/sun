@@ -85,7 +85,7 @@ def get_dag_path( objectName):
         selectionList.getDagPath(0, oNode)
         return oNode
 
-def set_historic(value: bool = False):
+def set_historic():
     '''
     '''
 
@@ -119,7 +119,10 @@ def set_historic(value: bool = False):
     for type in types:
         nodes = cmds.ls(type = type)
         for node in nodes:
-            cmds.setAttr(f'{node}.ihi', value)
+            try:
+                cmds.connectAttr(f'ctrl_main.mode', f'{node}.ihi', force = True)
+            except:
+                pass
 
 def bake_pivot(node: str, x = 'cx', y = 'ymin', z =  'cz'):
     '''
