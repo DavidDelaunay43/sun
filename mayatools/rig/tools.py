@@ -26,17 +26,20 @@ def rivet_geo():
     cmds.makeIdentity(bind, apply = True, t=1, r=1)
     cmds.skinCluster(bind, geo, mi=1)
 
-def create_blendshapes(bshape_prefix: str):
+def create_blendshapes(base_string: str, bshape_string: str):
     '''
     '''
 
     for geo in cmds.ls(sl=1):
         
         shape = cmds.listRelatives(geo, shapes = True)[0]
-        skin_cluster = cmds.listConnections(shape, type='skinCluster', connections = True)[-1]
         
-        deform_geo = f'{bshape_prefix}{geo}'
+        deform_geo = geo.replace(base_string, bshape_string)
         bshape_node = cmds.blendShape(deform_geo, geo, name = f'BShape_{geo}')[0]
         cmds.setAttr(bshape_node + '.' + deform_geo, 1)
         cmds.setAttr(f'{bshape_node}.{deform_geo}', 1)
-        cmds.reorderDeformers(skin_cluster, bshape_node)
+        
+        skin_cluster = cmds.listConnections(shape, type='skinCluster', connections = True)
+        if skin_cluster:
+            skin_cluster = skin_cluster[-1]
+            cmds.reorderDeformers(skin_cluster, bshape_node)
