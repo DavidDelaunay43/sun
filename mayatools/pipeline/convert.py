@@ -34,15 +34,11 @@ def convert_abc_to_gpu_cache(alembic_file_path: str, output_directory: str) -> N
 
 # CODE
 
-sim_directory: str = r'Z:\06_shot\seq030\sh080\fx\sand\sim'
+sim_directory: str = r'//gandalf/3d4_23_24/COUPDESOLEIL/06_shot/seq030/sh080/fx/sand/sim'
 alembic_files: tuple = (
-    'static_grains_01.abc',
     'static_grains_02.abc',
     'static_grains_03.abc',
-    'static_grains_04.abc',
-    'static_grains_05.abc',
-    'static_caillou_01.abc',
-    'static_caillou_02.abc'
+    'static_grains_04.abc'
 )
 
 for i, alembic_file in enumerate(alembic_files):
