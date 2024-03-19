@@ -7,21 +7,21 @@ def find_alembic_node(node: str):
     if not shape:
         cmds.error(f'No shape found under : {node}')
     shape = shape[0]
-    list = cmds.listConnections(shape)
-    for item in list:
+    connected_nodes = cmds.listConnections(shape)
+    for item in connected_nodes:
         if cmds.nodeType(item) == 'AlembicNode':
             return item
         
     cmds.error(f'Found no alembic node connected to : {shape}')
 
-def offset_alembic(alembic_node: str, fps: Literal["24 fps", "16fps", "12fps", "8fps", "6fps"] = "24 fps"):
+def offset_alembic(alembic_node: str, fps: Literal["24 fps", "16 fps", "12 fps", "8 fps", "6 fps"] = "24 fps"):
 
     fps_dict = {
         "24 fps": 1, 
-        "16fps": 1.5, 
-        "12fps": 2, 
-        "8fps": 3, 
-        "6fps": 4
+        "16 fps": 1.5, 
+        "12 fps": 2, 
+        "8 fps": 3, 
+        "6 fps": 4
     }
 
     old_expression_node = cmds.listConnections(alembic_node, type = 'expression')
@@ -45,14 +45,14 @@ class FpsWindow():
         
         cmds.workspaceControl(self.title, retain = False, floating = False, height = 110, width = 300)
         cmds.columnLayout(adjustableColumn = True)
-        self.fps_menu = cmds.textScrollList(allowMultiSelection = False, height = 80, append = ("24 fps", "16fps", "12fps", "8fps", "6fps"), selectItem = '24 fps' )
+        self.fps_menu = cmds.textScrollList(allowMultiSelection = False, height = 80, append = ("24 fps", "16 fps", "12 fps", "8 fps", "6 fps"), selectItem = '24 fps' )
 
         cmds.button(label = "OK", command = self.changefps)
         cmds.showWindow(self.title)
 
     def changefps(self, button):
 
-        fps_selection = cmds.textScrollList(self.fps_menu, query=True, si = True)
+        fps_selection = cmds.textScrollList(self.fps_menu, query = True, selectItem = True)
         fps_selection = fps_selection[0]
 
         selection: list = cmds.ls(selection = True)
