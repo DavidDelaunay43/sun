@@ -5,6 +5,21 @@ from .. import (
 reload(constants_maya)
 from ..constants_maya import *
 
+def bounding_box_override(value):
+
+    def bbox_override(node, value = value):
+        cmds.setAttr(f'{node}.overrideEnabled', value)
+        cmds.setAttr(f'{node}.overrideLevelOfDetail', value)
+
+    for node in cmds.ls(selection = True):
+
+        if cmds.nodeType(node) == 'mesh':
+            bbox_override(node, value)
+
+        shapes = cmds.listRelatives(shapes = True)
+        for shape in shapes:
+            bbox_override(shape, value)
+
 def rename_shape(nodes: Union[str, list]) -> None:
     '''
     '''
