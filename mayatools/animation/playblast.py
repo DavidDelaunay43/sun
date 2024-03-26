@@ -1,5 +1,6 @@
 from maya import cmds
 import os
+from subprocess import Popen
 
 def get_sound_node() -> str:
     audio_nodes = cmds.ls(type = 'audio')
@@ -15,6 +16,12 @@ def list_existing_files(directory: str, file_basename: str) -> list:
 
     existing_files.sort()
     return existing_files
+
+def open_movie_file(movie_file_path: str) -> None:
+
+    APP_DIR: str = r'C:\Program Files\Keyframe Pro\bin\KeyframePro.exe'
+    command = [APP_DIR, movie_file_path]
+    Popen(command)
 
 def playblast():
 
@@ -46,5 +53,7 @@ def playblast():
     else:
         print(f"cmds.playblast(format = 'qt', filename = {movie_file_path}, sequenceTime = False, clearCache = True, viewer = True, showOrnaments = False, offScreen = True, framePadding = 4, percent = 100, compression = 'H.264', quality = 100, widthHeight = [1998, 1080])")
         cmds.playblast(format = 'qt', filename = movie_file_path, sequenceTime = False, clearCache = True, viewer = True, showOrnaments = False, offScreen = True, framePadding = 4, percent = 100, compression = 'H.264', quality = 100, widthHeight = [1998, 1080])
+
+    open_movie_file(movie_file_path)
 
 playblast()
