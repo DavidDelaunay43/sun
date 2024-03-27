@@ -20,7 +20,7 @@ from .spine_mod import (
 from .facial import (
     facial_ribbon
 )
-from .blenshape import (
+from .blendshape import (
     transfer_deformation_to_blendshape,
     TransferDialog
 )

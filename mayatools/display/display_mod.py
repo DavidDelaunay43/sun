@@ -1,9 +1,23 @@
 from ...utils.imports import *
 from .. import tools
+
 reload(tools)
 
-def color_node(nodes: Union[str, list], 
-    input_col: Literal["blue", "blue_elec", "gold", "green", "magenta", "orange", "pink", "red", "yellow", "white"]
+
+def color_node(
+    nodes: Union[str, list],
+    input_col: Literal[
+        "blue",
+        "blue_elec",
+        "gold",
+        "green",
+        "magenta",
+        "orange",
+        "pink",
+        "red",
+        "yellow",
+        "white",
+    ],
 ):
     """Color the nodes in the viewport and outliner.
 
@@ -27,7 +41,7 @@ def color_node(nodes: Union[str, list],
         "pink": ((0.892, 0.589, 0.745), (0.948, 0.238, 0.633)),
         "red": ((1.0, 0.4, 0.4), (1.0, 0.195, 0.0)),
         "yellow": ((0.9906, 0.99258, 0.38934), (1.0, 1.0, 0.12479)),
-        "white": ((1.0, 1.0, 1.0), (1.0, 1.0, 1.0))
+        "white": ((1.0, 1.0, 1.0), (1.0, 1.0, 1.0)),
     }
 
     if input_col in colors:
@@ -40,6 +54,7 @@ def color_node(nodes: Union[str, list],
             cmds.setAttr(f"{node}.overrideRGBColors", 1)
             cmds.setAttr(f"{node}.overrideColorRGB", *ov_col)
 
+
 def joint_rad(jnts: Union[str, list], factor: float):
 
     jnts = tools.ensure_list(jnts)
@@ -50,6 +65,7 @@ def joint_rad(jnts: Union[str, list], factor: float):
         new_rad = rad * factor
 
         cmds.setAttr(f"{jnt}.radius", new_rad)
+
 
 def lod_vis(nodes: Union[str, list], v: bool):
     """Enable or disable LOD visibility on nodes.
@@ -65,13 +81,14 @@ def lod_vis(nodes: Union[str, list], v: bool):
     nodes = tools.ensure_list(nodes)
 
     for node in nodes:
-        shape = cmds.listRelatives(node, shapes = True)[0]
+        shape = cmds.listRelatives(node, shapes=True)[0]
 
         if shape:
             cmds.setAttr(f"{node}.lodVisibility", v)
 
         else:
             cmds.setAttr(f"{shape}.lodVisibility", v)
+
 
 def loc_size(locs: Union[str, list], size: float):
     """Edit the localScale attribute on the shape of the locators.
@@ -89,5 +106,5 @@ def loc_size(locs: Union[str, list], size: float):
     size = (size, size, size)
 
     for loc in locs:
-        loc_shape = cmds.listRelatives(loc, shapes = True)[0]
+        loc_shape = cmds.listRelatives(loc, shapes=True)[0]
         cmds.setAttr(f"{loc_shape}.localScale", *size)
