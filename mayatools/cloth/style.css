@@ -1,0 +1,42 @@
+/* Style pour le conteneur principal */
+QWidget {
+    background-color: #1E1E1E; /* Couleur de fond sombre */
+    color: #FFFFFF; /* Couleur du texte */
+    border: 2px solid #3E3E3E; /* Bordure */
+}
+
+/* Style pour les labels */
+QLabel {
+    color: #FFFFFF; /* Couleur du texte */
+}
+
+/* Style pour les line edits */
+QLineEdit {
+    background-color: #2E2E2E; /* Couleur de fond légèrement plus claire */
+    color: #FFFFFF; /* Couleur du texte */
+    border: 1px solid #3E3E3E; /* Bordure */
+}
+
+/* Style pour les boutons */
+QPushButton {
+    background-color: #3E3E3E; /* Couleur de fond */
+    color: #FFFFFF; /* Couleur du texte */
+    border: 1px solid #FFFFFF; /* Bordure */
+    padding: 5px 10px; /* Espacement intérieur */
+}
+
+/* Style pour les boutons lorsqu'ils sont survolés */
+QPushButton:hover {
+    background-color: #4E4E4E; /* Couleur de fond légèrement plus claire */
+}
+
+/* Style pour les boutons lorsqu'ils sont pressés */
+QPushButton:pressed {
+    background-color: #2E2E2E; /* Couleur de fond légèrement plus foncée */
+}
+
+/* Style pour les SetupWidget */
+SetupWidget {
+    border: 2px solid #CCCCCC; /* Cadre autour de chaque SetupWidget */
+    margin: 10px; /* Marge autour de chaque SetupWidget */
+}
