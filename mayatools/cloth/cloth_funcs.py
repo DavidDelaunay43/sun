@@ -197,6 +197,9 @@ def create_cloth(simu_nmesh: str, setup_prefix: str) -> tuple:
 
     ncloth_transform = cmds.rename(ncloth_transform, f'{setup_prefix}_ncloth')
 
+    start_frame: float = cmds.playbackOptions(query = True, minTime = True)
+    cmds.setAttr(f'{nucleus_node}.startFrame', start_frame)
+
     cmds.parent(simu_nmesh, nsystem_grp)
     cmds.parent(ncloth_transform, nsystem_grp)
     cmds.parent(nucleus_node, nsystem_grp)
@@ -412,13 +415,13 @@ class PrerollWidget(QWidget):
         self.start_frame_label = QLabel(f'Start frame')
         self.start_frame_lineedit = QLineEdit(f'{start_frame}')
 
-        self.start_pose_offset_label = QLabel('Start pose frame offset')
+        self.start_pose_offset_label = QLabel('Start pose offset')
         self.start_pose_offset_lineedit = QLineEdit(f'{-5.0}')
         
-        self.inter_pose_offset_label = QLabel('Inter pose frame offset')
+        self.inter_pose_offset_label = QLabel('Inter pose offset')
         self.inter_pose_offset_lineedit = QLineEdit(f'{-25.0}')
         
-        self.bind_pose_offset_label = QLabel('Bind pose frame offset')
+        self.bind_pose_offset_label = QLabel('Bind pose offset')
         self.bind_pose_offset_lineedit = QLineEdit(f'{-30.0}')
 
         self.info_label = QLabel('Select controlers')
@@ -625,6 +628,7 @@ class ClothUi(QDialog):
 
         # preroll layout
         self.preroll_layout.addWidget(self.pre_roll_widget)
+
 
     def create_connections(self):
         self.add_setup_btn.clicked.connect(self.add_setup_widget)
