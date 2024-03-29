@@ -1,6 +1,12 @@
 from maya import cmds, mel
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
+from PySide2.QtCore import (
+    Qt
+)
+from PySide2.QtGui import (
+    QIcon
+)
 from PySide2.QtWidgets import (
     QDialog,
     QLabel,
@@ -34,6 +40,7 @@ def create_passive_collider(mesh: str, nucleus_node: str) -> tuple:
         try:
             cmds.connectAttr(f'{nrigid_shape}.currentState', f'{nucleus_node}.inputPassive[{i}]')
             cmds.connectAttr(f'{nrigid_shape}.startState', f'{nucleus_node}.inputPassiveStart[{i}]')
+            break
         except RuntimeError:
             continue
 
@@ -73,6 +80,7 @@ def ensure_nsystem_group(setup_prefix: str) -> str:
     nsystem_grp: str = f'{setup_prefix}_nsystem_grp'
     if not cmds.objExists(nsystem_grp):
         cmds.group(empty = True, name = nsystem_grp, parent = CLOTH_GRP)
+        cmds.group(empty = True, name = f'{setup_prefix}_nConstraint_grp', parent = nsystem_grp)
 
     return nsystem_grp
 
@@ -142,13 +150,14 @@ def create_collider_mesh(init_mesh: str, nucleus_node: str, setup_prefix: str, c
     collider_mesh: str = duplicate_mesh(init_mesh, new_name = f'{setup_prefix}_collider_{collider_suffix}')
     cmds.parent(collider_mesh, collider_grp)
 
-    blendshape = cmds.blendShape(init_mesh, collider_mesh, name=f"BShape_{init_mesh}")
+    blendshape = cmds.blendShape(init_mesh, collider_mesh, name=f"BShape_{collider_mesh}")
     if isinstance(blendshape, list):
         blendshape = blendshape[0]
     cmds.setAttr(f"{blendshape}.{init_mesh}", 1.0)
 
     nrigid_transform, _ = create_passive_collider(collider_mesh, nucleus_node)
     cmds.parent(nrigid_transform, collider_grp)
+    cmds.select(clear = True)
 
 
 def create_hi_setup(simu_nmesh: str, hi_mesh: str, setup_prefix: str):
@@ -195,25 +204,26 @@ def maya_main_window():
     main_window_pointer = omui.MQtUtil.mainWindow()
     return wrapInstance(int(main_window_pointer), QWidget)
 
+
+ICON_PATH = 'C:/Users/d.delaunay/Documents/maya_dev/scripts/sun/mayatools/cloth/ncloth.svg'
 STYLE_PATH = 'C:/Users/d.delaunay/Documents/maya_dev/scripts/sun/mayatools/cloth/style.css'
 
 
 class SetupWidget(QWidget):
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(SetupWidget, self).__init__(parent)
 
         self.init_ui()
         self.create_widgets()
         self.create_layout()
         self.create_connections()
-        self.show()
 
         self.collider_dict = {}
 
     def init_ui(self):
-        size = (500, 500)
-        self.setStyleSheet(STYLE_PATH)
+        size = (300, 400)
+        self.setMinimumSize(*size)
 
     def create_widgets(self):
         self.setup_name_label = QLabel('Setup name')
@@ -222,10 +232,9 @@ class SetupWidget(QWidget):
         self.simu_nmesh_button = QPushButton('Simu nMesh')
         self.simu_nmesh_lineedit = QLineEdit()
 
-        self.himesh_button = QPushButton('hiMesh')
+        self.himesh_button = QPushButton('High Mesh')
         self.himesh_lineedit = QLineEdit()
 
-        self.colliders_label = QLabel('- - - - Colliders - - - -')
         self.add_collider_button = QPushButton('Add collider')
 
         self.collider_mesh_label = QLabel('Collider mesh')
@@ -247,15 +256,17 @@ class SetupWidget(QWidget):
         self.grid_layout.addWidget(self.himesh_button, 2, 0)
         self.grid_layout.addWidget(self.himesh_lineedit, 2, 1)
 
-        self.main_layout.addWidget(self.colliders_label)
-        self.main_layout.addWidget(self.add_collider_button)
+        # Ajouter le label et le bouton dans un QHBoxLayout
+        collider_button_layout = QHBoxLayout()
+        collider_button_layout.addWidget(self.add_collider_button)
+        self.main_layout.addLayout(collider_button_layout)
 
         self.collider_widget = QWidget()
         self.main_layout.addWidget(self.collider_widget)
         self.collider_layout = QGridLayout()
         self.collider_widget.setLayout(self.collider_layout)
-        self.collider_layout.addWidget(self.collider_mesh_label, 0, 0)
-        self.collider_layout.addWidget(self.collider_name_label, 0, 1)
+        self.collider_layout.addWidget(self.collider_mesh_label, 0, 0, Qt.AlignTop)
+        self.collider_layout.addWidget(self.collider_name_label, 0, 1, Qt.AlignTop)
 
         self.main_layout.addWidget(self.create_setup_button)
 
@@ -268,32 +279,31 @@ class SetupWidget(QWidget):
     def add_collider(self):
         collider_mesh_lineedit = QLineEdit()
         collider_name_lineedit = QLineEdit()
-        
+
         for i in range(1, 10):
             if self.collider_layout.itemAtPosition(i, 0):
                 continue
 
-            self.collider_layout.addWidget(collider_mesh_lineedit, i, 0)
-            self.collider_layout.addWidget(collider_name_lineedit, i, 1)
+            self.collider_layout.addWidget(collider_mesh_lineedit, i, 0, Qt.AlignTop)
+            self.collider_layout.addWidget(collider_name_lineedit, i, 1, Qt.AlignTop)
 
         self.collider_dict[collider_mesh_lineedit] = collider_name_lineedit
 
     def update_lineedit(self):
-
         button_label_dict = {
             self.simu_nmesh_button: self.simu_nmesh_lineedit,
             self.himesh_button: self.himesh_lineedit
         }
 
         lineedit: QLineEdit = button_label_dict[self.sender()]
-        
-        selection = cmds.ls(selection = True)
+
+        selection = cmds.ls(selection=True)
         if not selection:
             return
-        
+
         node_name: str = selection[0]
         lineedit.setText(node_name)
-        
+
     def create_setup(self):
         setup_prefix = self.setup_name_lineedit.text()
         low_mesh = self.simu_nmesh_lineedit.text()
@@ -303,7 +313,7 @@ class SetupWidget(QWidget):
         for key, value in self.collider_dict.items():
             collider_dict[key.text()] = value.text()
 
-        create_full_setup(setup_prefix, low_mesh, high_mesh, colliders = collider_dict)
+        create_full_setup(setup_prefix, low_mesh, high_mesh, colliders=collider_dict)
 
 class ClothUi(QDialog):
 
@@ -320,19 +330,20 @@ class ClothUi(QDialog):
 
     def init_ui(self):
         self.setWindowTitle('Cloth Setup')
-        size = (500, 500)
-        self.setMinimumSize(*size)
+        size = (350, 450)
+        self.resize(*size)
+
         with open(STYLE_PATH, 'r') as file:
             style = file.read()
         self.setStyleSheet(style)
 
+        self.setWindowIcon(QIcon(ICON_PATH))
+
     def create_widgets(self):
-        self.create_cloth_groups_btn = QPushButton('Create cloth groups')
         self.add_setup_btn = QPushButton('Add Setup')
 
     def create_layout(self):
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.addWidget(self.create_cloth_groups_btn)
         self.main_layout.addWidget(self.add_setup_btn)
 
         self.setup_widget = QWidget()
@@ -341,11 +352,11 @@ class ClothUi(QDialog):
 
     def create_connections(self):
         self.add_setup_btn.clicked.connect(self.add_setup_widget)
-        self.create_cloth_groups_btn.clicked.connect(ensure_cloth_groups)
 
     def add_setup_widget(self):
         setup_widget = SetupWidget(self)
         self.setup_layout.addWidget(setup_widget)
+        setup_widget.show()
         self.setup_widgets.append(setup_widget)
 
 
