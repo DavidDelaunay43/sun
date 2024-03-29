@@ -15,8 +15,11 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QVBoxLayout,
-    QWidget
+    QWidget,
+    QTabWidget
 )
+
+# Cloth funcs
 
 
 ALL_GRP = "ALL"
@@ -24,7 +27,18 @@ INIT_MESH_GRP = "initMesh_grp"
 CLOTH_GRP = "cloth_grp"
 HI_GRP = "hi_grp"
 
+
 def create_passive_collider(mesh: str, nucleus_node: str) -> tuple:
+    """
+    Create a passive collider for the specified mesh.
+
+    Parameters:
+        mesh (str): The name of the mesh to create the collider for.
+        nucleus_node (str): The name of the nucleus node to connect the collider to.
+
+    Returns:
+        tuple: A tuple containing the names of the created nRigid node and nRigidShape node.
+    """
 
     nrigid_shape = f'{mesh}_nRigidShape'
     cmds.createNode('nRigid', name = nrigid_shape)
@@ -48,6 +62,16 @@ def create_passive_collider(mesh: str, nucleus_node: str) -> tuple:
 
 
 def duplicate_mesh(mesh: str, new_name: str) -> str:
+    """
+    Duplicate a mesh with a new name.
+
+    Parameters:
+        mesh (str): The name of the mesh to duplicate.
+        new_name (str): The new name for the duplicated mesh.
+
+    Returns:
+        str: The name of the duplicated mesh.
+    """
 
     cmds.duplicate(mesh, name = new_name)
     shapes = cmds.listRelatives(new_name, shapes = True)
@@ -59,6 +83,10 @@ def duplicate_mesh(mesh: str, new_name: str) -> str:
 
 
 def ensure_cloth_groups() -> None:
+    """
+    Ensure the existence of cloth-related groups in the scene.
+    Creates groups if they do not exist.
+    """
 
     ALL_GRP: str = "ALL"
 
@@ -76,6 +104,15 @@ def ensure_cloth_groups() -> None:
 
 
 def ensure_nsystem_group(setup_prefix: str) -> str:
+    """
+    Ensure the existence of a nucleus system group in the scene.
+
+    Parameters:
+        setup_prefix (str): Prefix for the name of the nucleus system group.
+
+    Returns:
+        str: The name of the nucleus system group.
+    """
 
     nsystem_grp: str = f'{setup_prefix}_nsystem_grp'
     if not cmds.objExists(nsystem_grp):
@@ -86,6 +123,15 @@ def ensure_nsystem_group(setup_prefix: str) -> str:
 
 
 def ensure_colliders_group(setup_prefix: str) -> str:
+    """
+    Ensure the existence of a colliders group in the scene.
+
+    Parameters:
+        setup_prefix (str): Prefix for the name of the colliders group.
+
+    Returns:
+        str: The name of the colliders group.
+    """
 
     colliders_grp: str = f'{setup_prefix}_colliders_grp'
     nsystem_grp: str = ensure_nsystem_group(setup_prefix)
@@ -97,6 +143,15 @@ def ensure_colliders_group(setup_prefix: str) -> str:
 
 
 def ensure_init_mesh(deformed_mesh: str) -> str:
+    """
+    Ensure the existence of an initial mesh for cloth simulation.
+
+    Parameters:
+        deformed_mesh (str): The name of the deformed mesh.
+
+    Returns:
+        str: The name of the initial mesh.
+    """
 
     ensure_cloth_groups()
 
@@ -118,6 +173,16 @@ def ensure_init_mesh(deformed_mesh: str) -> str:
 
 
 def create_cloth(simu_nmesh: str, setup_prefix: str) -> tuple:
+    """
+    Create a cloth simulation setup.
+
+    Parameters:
+        simu_nmesh (str): The name of the simulated mesh.
+        setup_prefix (str): Prefix for the names of created objects.
+
+    Returns:
+        tuple: A tuple containing the names of the created ncloth shape and nucleus node.
+    """
 
     ensure_cloth_groups()
     nsystem_grp: str = ensure_nsystem_group(setup_prefix)
@@ -141,7 +206,16 @@ def create_cloth(simu_nmesh: str, setup_prefix: str) -> tuple:
     return ncloth_shape, nucleus_node
 
 
-def create_collider_mesh(init_mesh: str, nucleus_node: str, setup_prefix: str, collider_suffix: str):
+def create_collider_mesh(init_mesh: str, nucleus_node: str, setup_prefix: str, collider_suffix: str) -> None:
+    """
+    Create a collider mesh.
+
+    Parameters:
+        init_mesh (str): The name of the initial mesh.
+        nucleus_node (str): The name of the nucleus node to connect the collider to.
+        setup_prefix (str): Prefix for the names of created objects.
+        collider_suffix (str): Suffix for the name of the collider.
+    """
 
     ensure_cloth_groups()
     setup_colliders_grp: str = ensure_colliders_group(setup_prefix)
@@ -161,6 +235,14 @@ def create_collider_mesh(init_mesh: str, nucleus_node: str, setup_prefix: str, c
 
 
 def create_hi_setup(simu_nmesh: str, hi_mesh: str, setup_prefix: str):
+    """
+    Create a high-resolution setup for cloth simulation.
+
+    Parameters:
+        simu_nmesh (str): The name of the simulated mesh.
+        hi_mesh (str): The name of the high-resolution mesh.
+        setup_prefix (str): Prefix for the names of created objects.
+    """
 
     ensure_cloth_groups()
 
@@ -175,11 +257,20 @@ def create_hi_setup(simu_nmesh: str, hi_mesh: str, setup_prefix: str):
         blendshape = blendshape[0]
     cmds.setAttr(f"{blendshape}.{simu_nmesh}", 1.0)
 
-    wrap_node: str = cmds.cvWrap(hi_mesh, simu_driver_mesh, name='cvWrap_hi', radius=0.1)
+    wrap_node: str = cmds.cvWrap(hi_mesh, simu_driver_mesh, name=f'cvWrap_{hi_mesh}', radius=0.1)
     cmds.select(clear = True)
 
 
 def create_full_setup(setup_prefix: str, low_mesh: str, high_mesh: str, colliders: dict = None) -> None:
+    """
+    Create a full cloth simulation setup.
+
+    Parameters:
+        setup_prefix (str): Prefix for the names of created objects.
+        low_mesh (str): The name of the low-resolution mesh.
+        high_mesh (str): The name of the high-resolution mesh.
+        colliders (dict, optional): A dictionary containing collider meshes and their suffixes.
+    """
     
     ensure_cloth_groups()
     ensure_nsystem_group(setup_prefix)
@@ -198,6 +289,97 @@ def create_full_setup(setup_prefix: str, low_mesh: str, high_mesh: str, collider
         create_collider_mesh(init_mesh, nucleus_node, setup_prefix, collider_suffix)
 
 
+# Pre-roll funcs
+
+
+def get_preroll_frames(
+    start_anim_frame: float,
+    start_pose_offset: float = -5.0,
+    inter_pose_offset: float = -25.0, 
+    bind_pose_offset: float = -30.0 
+) -> dict:
+
+    start_pose_frame: float = start_anim_frame + start_pose_offset
+    inter_pose_frame: float = start_anim_frame + inter_pose_offset
+    bind_pose_frame: float = start_anim_frame + bind_pose_offset
+
+    preroll_frames_dict ={
+        'start_anim_frame': start_anim_frame,
+        'start_pose_frame': start_pose_frame,
+        'inter_pose_frame': inter_pose_frame,
+        'bind_pose_frame': bind_pose_frame
+    }
+
+    return preroll_frames_dict
+
+
+def set_preroll_time_slider(preroll_frames: dict) -> None:
+
+    bind_pose_frame: float = preroll_frames['bind_pose_frame']
+    end_frame: float = cmds.playbackOptions(query=True, maxTime=True)
+    cmds.playbackOptions(minTime = bind_pose_frame, maxTime = end_frame)
+
+
+def set_key_frame(controler: str) -> None:
+
+    for attribute in cmds.listAttr(controler, keyable = True):
+        cmds.setKeyframe(f'{controler}.{attribute}')
+
+
+def set_attributes_to_defaults(controler: str) -> None:
+
+    attribute_dict = {
+        'translateX': 0.0,
+        'translateY': 0.0,
+        'translateZ': 0.0,
+        'rotateX': 0.0,
+        'rotateY': 0.0,
+        'rotateZ': 0.0,
+        'scaleX': 1.0,
+        'scaleY': 1.0,
+        'scaleZ': 1.0
+    }
+
+    for attribute in cmds.listAttr(controler, keyable = True):
+        if not cmds.attributeQuery(attribute, node = controler, keyable = True):
+            continue
+        
+        if not attribute in attribute_dict.keys():
+            continue
+
+        default_value: float = attribute_dict[attribute]
+        cmds.setAttr(f'{controler}.{attribute}', default_value)
+
+
+def set_preroll_keys(controlers: list, preroll_frames: dict) -> None:
+
+    # set start pose
+    cmds.currentTime(preroll_frames['start_pose_frame'])
+    for ctrl in controlers:
+        set_key_frame(ctrl)
+
+    # set inter pose
+    cmds.currentTime(preroll_frames['inter_pose_frame'])
+    for ctrl in controlers:
+        set_attributes_to_defaults(ctrl)
+        set_key_frame(ctrl)
+
+    # set bind pose
+    cmds.currentTime(preroll_frames['bind_pose_frame'])
+    for ctrl in controlers:
+        set_key_frame(ctrl)
+
+
+def set_preroll(controlers: list, preroll_values: list):
+
+    preroll_frames: dict = get_preroll_frames(*preroll_values)
+    set_preroll_time_slider(preroll_frames)
+    set_preroll_keys(controlers, preroll_frames)
+
+
+# User interface
+
+
 def maya_main_window():
     """Return the Maya main window widget as a Python object."""
 
@@ -207,6 +389,78 @@ def maya_main_window():
 
 ICON_PATH = 'C:/Users/d.delaunay/Documents/maya_dev/scripts/sun/mayatools/cloth/ncloth.svg'
 STYLE_PATH = 'C:/Users/d.delaunay/Documents/maya_dev/scripts/sun/mayatools/cloth/style.css'
+
+
+class PrerollWidget(QWidget):
+
+    def __init__(self, parent=None):
+        super(PrerollWidget, self).__init__(parent)
+
+        self.init_ui()
+        self.create_widgets()
+        self.create_layout()
+        self.create_connections()
+
+
+    def init_ui(self):
+        size = (300, 400)
+        self.setMinimumSize(*size)
+
+
+    def create_widgets(self):
+        start_frame: float = cmds.playbackOptions(query = True, minTime = True)
+        self.start_frame_label = QLabel(f'Start frame')
+        self.start_frame_lineedit = QLineEdit(f'{start_frame}')
+
+        self.start_pose_offset_label = QLabel('Start pose frame offset')
+        self.start_pose_offset_lineedit = QLineEdit(f'{-5.0}')
+        
+        self.inter_pose_offset_label = QLabel('Inter pose frame offset')
+        self.inter_pose_offset_lineedit = QLineEdit(f'{-25.0}')
+        
+        self.bind_pose_offset_label = QLabel('Bind pose frame offset')
+        self.bind_pose_offset_lineedit = QLineEdit(f'{-30.0}')
+
+        self.info_label = QLabel('Select controlers')
+        self.run_button = QPushButton('Preroll')
+
+
+    def create_layout(self):
+        self.main_layout = QVBoxLayout()
+        self.setLayout(self.main_layout)
+
+        self.grid_widget = QWidget()
+        self.grid_layout = QGridLayout()
+        self.grid_widget.setLayout(self.grid_layout)
+        self.main_layout.addWidget(self.grid_widget)
+
+        self.grid_layout.addWidget(self.start_frame_label, 0, 0)
+        self.grid_layout.addWidget(self.start_frame_lineedit, 0, 1)
+        self.grid_layout.addWidget(self.start_pose_offset_label, 1, 0)
+        self.grid_layout.addWidget(self.start_pose_offset_lineedit, 1, 1)
+        self.grid_layout.addWidget(self.inter_pose_offset_label, 2, 0)
+        self.grid_layout.addWidget(self.inter_pose_offset_lineedit, 2, 1)
+        self.grid_layout.addWidget(self.bind_pose_offset_label, 3, 0)
+        self.grid_layout.addWidget(self.bind_pose_offset_lineedit, 3, 1)
+
+        self.main_layout.addWidget(self.info_label)
+        self.main_layout.addWidget(self.run_button)
+
+
+    def create_connections(self):
+        self.run_button.clicked.connect(self.preroll)
+
+
+    def preroll(self):
+        start_frame = float(self.start_frame_lineedit.text())
+        start_pose_offset = float(self.start_pose_offset_lineedit.text())
+        inter_pose_offset = float(self.inter_pose_offset_lineedit.text())
+        bind_pose_offset = float(self.bind_pose_offset_lineedit.text())
+
+        preroll_values = [start_frame, start_pose_offset, inter_pose_offset, bind_pose_offset]
+
+        controlers: list = cmds.ls(selection = True)
+        set_preroll(controlers, preroll_values)
 
 
 class SetupWidget(QWidget):
@@ -315,7 +569,9 @@ class SetupWidget(QWidget):
 
         create_full_setup(setup_prefix, low_mesh, high_mesh, colliders=collider_dict)
 
+
 class ClothUi(QDialog):
+
 
     def __init__(self, parent = maya_main_window()):
         super(ClothUi, self).__init__(parent)
@@ -328,6 +584,7 @@ class ClothUi(QDialog):
 
         self.setup_widgets = []
 
+
     def init_ui(self):
         self.setWindowTitle('Cloth Setup')
         size = (350, 450)
@@ -339,19 +596,39 @@ class ClothUi(QDialog):
 
         self.setWindowIcon(QIcon(ICON_PATH))
 
+
     def create_widgets(self):
         self.add_setup_btn = QPushButton('Add Setup')
+        self.pre_roll_widget = PrerollWidget(self)
+
 
     def create_layout(self):
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.addWidget(self.add_setup_btn)
 
+        self.main_layout = QVBoxLayout(self)
+        self.tab_widget = QTabWidget()
+        self.main_layout.addWidget(self.tab_widget)
+
+        self.cloth_widget = QWidget()
+        self.preroll_widget = QWidget()
+
+        self.cloth_layout = QVBoxLayout(self.cloth_widget)
+        self.preroll_layout = QVBoxLayout(self.preroll_widget)
+
+        self.tab_widget.addTab(self.cloth_widget, 'Cloth')
+        self.tab_widget.addTab(self.preroll_widget, 'Preroll')
+
+        # cloth layout
+        self.cloth_layout.addWidget(self.add_setup_btn)
         self.setup_widget = QWidget()
         self.setup_layout = QHBoxLayout(self.setup_widget)
-        self.main_layout.addWidget(self.setup_widget)
+        self.cloth_layout.addWidget(self.setup_widget)
+
+        # preroll layout
+        self.preroll_layout.addWidget(self.pre_roll_widget)
 
     def create_connections(self):
         self.add_setup_btn.clicked.connect(self.add_setup_widget)
+
 
     def add_setup_widget(self):
         setup_widget = SetupWidget(self)

@@ -3,7 +3,7 @@ QWidget {
     background-color: #1E1E1E; /* Couleur de fond sombre */
     color: #FFFFFF; /* Couleur du texte */
     border: 1px solid #8c96a0; /* Cadre autour de chaque SetupWidget avec une bordure bleue */
-    font-size: 16px; /* Taille de police */
+    font-size: 14px; /* Taille de police */
     font-family: Arial, sans-serif; /* Police de caractère sans-serif */
 }
 
@@ -11,7 +11,7 @@ QWidget {
 QLabel {
     color: #FFFFFF; /* Couleur du texte */
     border: none; /* Bordure bleue */
-    font-size: 14px; /* Taille de police */
+    font-size: 12px; /* Taille de police */
     font-family: Arial, sans-serif; /* Police de caractère sans-serif */
 }
 
@@ -20,7 +20,7 @@ QLineEdit {
     background-color: #2E2E2E; /* Couleur de fond légèrement plus claire */
     color: #FFFFFF; /* Couleur du texte */
     border: none; /* Bordure bleue */
-    font-size: 14px; /* Taille de police */
+    font-size: 12px; /* Taille de police */
     font-family: Arial, sans-serif; /* Police de caractère sans-serif */
 }
 
@@ -30,7 +30,7 @@ QPushButton {
     color: #FFFFFF; /* Couleur du texte */
     border: none; /* Aucune bordure */
     padding: 8px 16px; /* Espacement intérieur */
-    font-size: 14px; /* Taille de police */
+    font-size: 12px; /* Taille de police */
     font-family: Arial, sans-serif; /* Police de caractère sans-serif */
 }
 
