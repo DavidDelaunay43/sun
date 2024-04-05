@@ -74,11 +74,14 @@ def duplicate_mesh(mesh: str, new_name: str) -> str:
     """
 
     cmds.duplicate(mesh, name = new_name)
-    shapes = cmds.listRelatives(new_name, shapes = True)
+    shapes = cmds.listRelatives(new_name, shapes = True, fullPath = True)
     for shape in shapes:
-        if 'Orig' in shape:
+        if cmds.getAttr(f'{shape}.intermediateObject') == 1:
             cmds.delete(shape)
-    
+
+        else:
+            cmds.rename(shape, f'{new_name}Shape')
+
     return new_name
 
 
