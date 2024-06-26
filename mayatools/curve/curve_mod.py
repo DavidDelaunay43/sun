@@ -30,6 +30,17 @@ def add_shape(nodes):
         parent_shapes([ctrl, node])
 
 
+def remove_shape(nodes: list) -> None:
+
+    nodes: list = tools.ensure_list(nodes)
+    for node in nodes:
+        shapes = cmds.listRelatives(node, shapes = True, fullPath = True)
+        if not shapes:
+            return
+        for shape in shapes:
+            cmds.delete(shape)
+
+
 def scale_shape(curves, value: float):
     """Scale the specified Maya curves by a given factor.
 

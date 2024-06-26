@@ -138,6 +138,8 @@ def op_matrix_to_transforms(nodes):
             type="matrix",
         )
 
+        cmds.select(node)
+
 
 offset = partial(_offset_grps, offset_names=OFFSET)
 move = partial(_offset_grps, offset_names=MOVE)
@@ -154,6 +156,7 @@ def move_op_matrix(nodes):
     nodes = tools.ensure_list(nodes)
     for node in nodes:
         move(node)
+        offset_parent_matrix(node)
         offset_parent_matrix(f"{node}_{MOVE}")
 
 
@@ -163,6 +166,7 @@ def hook_op_matrix(nodes):
     nodes = tools.ensure_list(nodes)
     for node in nodes:
         hook(node)
+        offset_parent_matrix(node)
         offset_parent_matrix(f"{node}_{HOOK}")
 
 
@@ -172,6 +176,7 @@ def move_hook_op_matrix(nodes):
     nodes = tools.ensure_list(nodes)
     for node in nodes:
         move_hook(node)
+        offset_parent_matrix(node)
         offset_parent_matrix(f"{node}_{HOOK}")
 
 

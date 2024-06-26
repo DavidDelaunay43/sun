@@ -1,5 +1,6 @@
 from .curve_mod import (
     add_shape,
+    remove_shape,
     scale_shape,
     shape_vis,
     ensure_shape,
