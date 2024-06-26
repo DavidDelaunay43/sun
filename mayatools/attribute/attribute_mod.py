@@ -153,6 +153,12 @@ def cb_attributes(
 vis_no_keyable = partial(cb_attributes, ats=["v"], nonkeyable=True)
 
 
+def proxy_attribute(nodes: list, proxy_node: str, attribute: str) -> None:
+
+    nodes: list = tools.ensure_list(nodes)
+    for node in nodes:
+        cmds.addAttr(node, longName=attribute, niceName=attribute.capitalize(), proxy=f'{proxy_node}.{attribute}')
+
 def watermark():
 
     nodes: list = cmds.ls(selection=True)

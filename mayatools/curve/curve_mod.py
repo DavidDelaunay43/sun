@@ -214,7 +214,7 @@ def control(shape: str = "sphere", name: str = "control", color: str = "yellow")
     if shape in ["star"]:
         degree = 3
 
-    cmds.curve(name=name, degree=degree, point=vertex_coords)
+    name = cmds.curve(name=name, degree=degree, point=vertex_coords)
     display.color_node(name, color)
     cmds.select(clear=True)
     return name

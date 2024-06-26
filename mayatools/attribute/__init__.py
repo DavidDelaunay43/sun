@@ -4,6 +4,7 @@ from .attribute_mod import (
     dag_rman_attribs,
     sep_cb,
     cb_attributes,
+    proxy_attribute,
     vis_no_keyable,
     watermark
 )
